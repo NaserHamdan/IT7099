@@ -16,7 +16,6 @@ class CreateCoursesTutorsTable extends Migration
         Schema::create('courses_tutors', function (Blueprint $table) {
             $table->foreignId('course_id')->constrained('courses')->references('course_id');
             $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id');
-            $table->timestamps();
         });
     }
 

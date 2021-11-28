@@ -16,9 +16,8 @@ class CreateInvigiliationsTable extends Migration
         Schema::create('invigiliations', function (Blueprint $table) {
             $table->foreignId('exam_id')->constrained('exams')->references('exam_id');
             $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id');
-            $table->char('invigilation_type');
+            $table->char('invigilation_type',1);
             $table->string('room');
-            $table->timestamps();
         });
     }
 

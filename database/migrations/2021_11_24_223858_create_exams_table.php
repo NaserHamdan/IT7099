@@ -14,12 +14,11 @@ class CreateExamsTable extends Migration
     public function up()
     {
         Schema::create('exams', function (Blueprint $table) {
-            $table->id('exam_id');
+            $table->id('exam_id')->autoIncrement();
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
             $table->foreignId('course_id')->constrained('courses')->references('course_id');
-            $table->timestamps();
         });
     }
 

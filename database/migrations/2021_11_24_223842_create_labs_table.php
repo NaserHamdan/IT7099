@@ -14,11 +14,10 @@ class CreateLabsTable extends Migration
     public function up()
     {
         Schema::create('labs', function (Blueprint $table) {
-            $table->id('lab_id');
+            $table->id('lab_id')->autoIncrement();
             $table->integer('capacity');
             $table->string('room');
             $table->string('building');
-            $table->timestamps();
         });
     }
 
