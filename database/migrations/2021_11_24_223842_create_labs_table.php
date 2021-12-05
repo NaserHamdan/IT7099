@@ -15,9 +15,10 @@ class CreateLabsTable extends Migration
     {
         Schema::create('labs', function (Blueprint $table) {
             $table->id('lab_id')->autoIncrement();
-            $table->integer('capacity');
+            $table->integer('capacity')->default(20);
             $table->string('room');
             $table->string('building');
+            $table->boolean('reviewed')->default(false);
         });
     }
 

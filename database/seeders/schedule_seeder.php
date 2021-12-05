@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class schedule_seeder extends Seeder
@@ -23,7 +24,7 @@ class schedule_seeder extends Seeder
             'host' => env('DB_HOST'),
             'database' => env('DB_DATABASE')
         ];
-
-        exec("mysql --user={$db['username']} --password={$db['password']} --host={$db['host']} --database {$db['database']} < $sql");
+        DB::unprepared(file_get_contents($sql));
+        // exec("mysql --user={$db['username']} --password={$db['password']} --host={$db['host']} --database {$db['database']} < $sql");
     }
 }

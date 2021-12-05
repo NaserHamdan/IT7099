@@ -43,7 +43,7 @@ class CreateScheduleTable extends Migration
             $table->string('SEC_TUTOR',4000)->nullable(true);
             $table->string('SEC_PRIMARY_TUTOR',1)->nullable(true);
             $table->string('SEC_OVERRIDE',1)->nullable(true);
-            $table->decimal('SEC_MAX_EMROLLMENT',4)->nullable(true);
+            $table->decimal('SEC_MAX_EMROLLMENT',6)->nullable(true);
             $table->decimal('SEC_ENROLLED_STUDENTS')->nullable(true);
             $table->string('SEC_SYAAITM_EXISTS',1)->nullable(true);
             $table->string('SEC_CAPP_PREREQ_IND',1)->nullable(true);

@@ -17,6 +17,7 @@ class CreateTutorsTable extends Migration
             $table->id('tutor_id')->autoIncrement();
             $table->string('tutor_name');
             $table->string('position');
+            $table->boolean('reviewd')->default(false);
         });
     }
 

@@ -19,8 +19,9 @@ class CreateCoursesTable extends Migration
             $table->string('course_title');
             $table->integer('number_of_students')->default(0);
             $table->string('marking_diffucality')->default("Low");
-            $table->string('course_coordinator');
+            $table->string('course_coordinator')->default('NA');
             $table->char('have_exam',1)->default("N");
+            $table->boolean('reviewed')->default(false);
             $table->foreignId('year_id')->constrained('years')->references("year_id");
             $table->foreignId('major_id')->constrained('majors')->references("major_id");
         });
