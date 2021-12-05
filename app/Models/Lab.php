@@ -21,7 +21,9 @@ class Lab extends Model
 
 
 
-
+    public function exams_labs(){
+        return $this->hasMany(exams_labs::class,'lab_id','lab_id');
+    }
 
     /**
      * Get the value of fillable

@@ -10,24 +10,24 @@
                         aria-controls="mobile-menu" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
                         <!--
-                  Icon when menu is closed.
+                      Icon when menu is closed.
 
-                  Heroicon name: outline/menu
+                      Heroicon name: outline/menu
 
-                  Menu open: "hidden", Menu closed: "block"
-                -->
+                      Menu open: "hidden", Menu closed: "block"
+                    -->
                         <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" aria-hidden="true" id="open">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                         <!--
-                  Icon when menu is open.
+                      Icon when menu is open.
 
-                  Heroicon name: outline/x
+                      Heroicon name: outline/x
 
-                  Menu open: "block", Menu closed: "hidden"
-                -->
+                      Menu open: "block", Menu closed: "hidden"
+                    -->
                         <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" aria-hidden="true" id="close">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -46,18 +46,17 @@
                                 class="text-white hover:bg-red-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                                 href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                                                  document.getElementById('logout-form').submit();">{{ __('Hello,
-                                                                                                                            Nasser') }}</a>
-                            <a href="#"
+                                                      document.getElementById('logout-form').submit();">Hello, {{Auth::user()->name}}</a>
+                            <a href="{{ route('Schedule') }}"
                                 class="text-white hover:bg-red-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Schedule</a>
 
-                            <a href="#"
+                            <a href="{{ route('Courses') }}"
                                 class="text-white hover:bg-red-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
 
-                            <a href="#"
+                            <a href="{{ route('Invigilators') }}"
                                 class="text-white hover:bg-red-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Invigilators</a>
 
-                            <a href="#"
+                            <a href="{{ route('Labs') }}"
                                 class="text-white hover:bg-red-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Labs</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
@@ -72,11 +71,11 @@
                 <div class="ml-3 relative">
                     <div>
                         <div class="flex-shrink-0 flex items-center">
-                            <img class="block lg:hidden h-8 w-auto"
-                                src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">
-                            <img class="hidden lg:block h-8 w-auto"
-                                src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg"
-                                alt="Workflow">
+                            <img class="block lg:hidden h-12 w-auto"
+                                src="assets/images/Logo-square.png" alt="Bahrain Polytechnic">
+                            <img class="hidden lg:block h-12 w-auto"
+                                src="assets/images/Logo-Line.png"
+                                alt="Bahrain Polytechnic">
                         </div>
                     </div>
 
@@ -90,21 +89,21 @@
         <div class="hidden sm:hidden" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <!-- selected: "bg-red-900 text-white block px-3 py-2 rounded-md text-base font-medium" -->
-                <a href="#"
+                <a href="{{ route('Schedule') }}"
                     class="text-white hover:bg-red-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Schedule</a>
 
-                <a href="#"
+                <a href="{{ route('Courses') }}"
                     class="text-white hover:bg-red-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Courses</a>
 
-                <a href="#"
+                <a href="{{ route('Invigilators') }}"
                     class="text-white hover:bg-red-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Invigilators</a>
 
-                <a href="#"
+                <a href="{{ route('Labs') }}"
                     class="text-white hover:bg-red-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Labs</a>
                 <a href="#"
                     class="text-white hover:bg-red-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
                     href="{{ route('logout') }}" onclick="event.preventDefault();
-                                  document.getElementById('logout-form').submit();">{{ __('Log out') }}</a>
+                                      document.getElementById('logout-form').submit();">{{ __('Log out') }}</a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                     @csrf
                 </form>

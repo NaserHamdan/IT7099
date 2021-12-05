@@ -18,8 +18,9 @@ class Tutor extends Model
         'reviewed',
     ];
 
-
-
+    public function invigilations(){
+        return $this->hasMany(inviligations::class,'tutor_id','tutor_id');
+    }
 
 
     /**

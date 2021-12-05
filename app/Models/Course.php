@@ -24,6 +24,18 @@ class Course extends Model
         'reviewed',
     ];
 
+    public function major(){
+        return $this->belongsTo(Major::class,'major_id','major_id');
+    }
+
+    public function year(){
+        return $this->belongsTo(Year::class,'year_id','year_id');
+    }
+
+    public function tutors()
+    {
+        return $this->belongsToMany(Tutor::class,'courses_tutors','course_id','tutor_id');
+    }
     /**
      * Get the value of fillable
      */

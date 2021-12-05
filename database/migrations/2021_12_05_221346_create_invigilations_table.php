@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInvigiliationsTable extends Migration
+class CreateInvigilationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateInvigiliationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('invigiliations', function (Blueprint $table) {
+        Schema::create('invigilations', function (Blueprint $table) {
             $table->foreignId('exam_id')->constrained('exams')->references('exam_id');
             $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id');
             $table->char('invigilation_type',1);
@@ -28,6 +28,6 @@ class CreateInvigiliationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('invigiliations');
+        Schema::dropIfExists('invigilations');
     }
 }

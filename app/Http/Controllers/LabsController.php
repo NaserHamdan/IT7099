@@ -11,7 +11,8 @@ class LabsController extends Controller
     //
     public function Labs()
     {
-        return view('labs');
+        $labs = Lab::with('exams_labs')->get();
+        return view('labs',['labs'=>$labs]);
     }
 
     public function LoadLabs(Request $request)
@@ -33,8 +34,12 @@ class LabsController extends Controller
         foreach ($labs as $lab) {
             if ($lab['sec_building'] != null && $lab['sec_room'] != null) {
                 $llab = Lab::where('room', $lab['sec_room'])->firstOrCreate(
-                    ['building' => $lab['sec_building']],
-                    ['room' => $lab['sec_room']],
+                    [
+                        'room' => $lab['sec_room']
+                    ],
+                    [
+                        'building' => $lab['sec_building']
+                    ],
                 );
 
             } else {
