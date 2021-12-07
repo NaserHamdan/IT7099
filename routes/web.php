@@ -46,3 +46,7 @@ Route::get('/LoadLabs', [App\Http\Controllers\LabsController::class, 'loadlabs']
 Route::get('/LoadCourses', [App\Http\Controllers\CourseController::class, 'loadcourses'])->name('LoadCourses')->middleware('auth');
 Route::get('/LinkTutors', [App\Http\Controllers\LinkingController::class, 'linkCoursesTutors'])->name('LinkTutors')->middleware('auth');
 
+//api
+Route::post('/addCourse', [App\Http\Controllers\ApiController::class, 'addCourse'])->name('addCourse')->middleware('auth');
+Route::post('/deleteCourse', [App\Http\Controllers\ApiController::class, 'deleteCourse'])->name('deleteCourse')->middleware('auth');
+

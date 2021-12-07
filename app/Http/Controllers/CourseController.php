@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Major;
 use App\Models\Schedule;
+use App\Models\Tutor;
+use App\Models\Year;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 
 class CourseController extends Controller
 {
@@ -14,9 +18,11 @@ class CourseController extends Controller
     {
         //$courses = Course::all();
         $courses = Course::with(['major', 'year','tutors'])->get();
-
+        $years = Year::all();
+        $majors = Major::all();
+        $tutors = Tutor::all();
         // return $courses[0]->tutors[0]->tutor_name;
-        return view('Courses', ['courses' => $courses]);
+        return view('Courses', ['courses' => $courses,'years'=>$years,'majors'=>$majors,'tutors'=>$tutors]);
     }
 
     public function EditCourses()
@@ -53,5 +59,8 @@ class CourseController extends Controller
             } else {
             }
         }
+        LinkingController::linkCoursesTutors($request);
+        return redirect('/Courses');
     }
+
 }

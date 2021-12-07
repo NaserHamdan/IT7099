@@ -14,8 +14,8 @@ class CreateInvigilationsTable extends Migration
     public function up()
     {
         Schema::create('invigilations', function (Blueprint $table) {
-            $table->foreignId('exam_id')->constrained('exams')->references('exam_id');
-            $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id');
+            $table->foreignId('exam_id')->constrained('exams')->references('exam_id')->onDelete('cascade');
+            $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id')->onDelete('cascade');
             $table->char('invigilation_type',1);
             $table->string('room');
         });

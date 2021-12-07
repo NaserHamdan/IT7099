@@ -12,7 +12,7 @@ class LinkingController extends Controller
 {
     //
 
-    public function linkCoursesTutors(Request $request)
+    public static function linkCoursesTutors(Request $request)
     {
         $term = "202101";
         $courses = Course::all();

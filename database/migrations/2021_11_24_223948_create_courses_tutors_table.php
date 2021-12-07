@@ -14,8 +14,8 @@ class CreateCoursesTutorsTable extends Migration
     public function up()
     {
         Schema::create('courses_tutors', function (Blueprint $table) {
-            $table->foreignId('course_id')->constrained('courses')->references('course_id');
-            $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id');
+            $table->foreignId('course_id')->constrained('courses')->references('course_id')->onDelete('cascade');
+            $table->foreignId('tutor_id')->constrained('tutors')->references('tutor_id')->onDelete('cascade');
         });
     }
 

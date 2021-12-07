@@ -36,6 +36,14 @@ class Course extends Model
     {
         return $this->belongsToMany(Tutor::class,'courses_tutors','course_id','tutor_id');
     }
+
+    public function exams(){
+        return $this->hasMany(Exam::class,'course_id','course_id');
+    }
+
+    public function courses_tutors(){
+        return $this->hasMany(course_tutor::class,'course_id','course_id');
+    }
     /**
      * Get the value of fillable
      */

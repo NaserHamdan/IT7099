@@ -14,8 +14,8 @@ class CreateExamsLabsTable extends Migration
     public function up()
     {
         Schema::create('exams_labs', function (Blueprint $table) {
-            $table->foreignId('lab_id')->constrained('labs')->references('lab_id');
-            $table->foreignId('exam_id')->constrained('exams')->references('exam_id');
+            $table->foreignId('lab_id')->constrained('labs')->references('lab_id')->onDelete('cascade');
+            $table->foreignId('exam_id')->constrained('exams')->references('exam_id')->onDelete('cascade');
         });
     }
 
