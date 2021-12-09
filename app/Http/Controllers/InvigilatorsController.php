@@ -32,5 +32,6 @@ class InvigilatorsController extends Controller
             } else {
             }
         }
+        return redirect('/Invigilators');
     }
 }

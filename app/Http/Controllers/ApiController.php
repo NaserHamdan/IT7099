@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\course_tutor;
+use App\Models\Lab;
+use App\Models\Tutor;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
@@ -27,6 +29,7 @@ class ApiController extends Controller
                 'marking_diffucality' => $data['marking_diffucality'],
                 'have_exam' => $data['have_exam'],
                 'course_coordinator' => $data['course_coordinator'],
+                'reviewed' => $data['reviewed'],
             ]
         );
         $tutors = $data['tutor'];
@@ -46,5 +49,132 @@ class ApiController extends Controller
         $course->exams()->delete();
         $course->delete();
         return redirect('/Courses');
+    }
+
+    public function fetchCourseData(Request $request)
+    {
+        $id = $request->id;
+        //
+        $course = Course::with('tutors')->where('course_id', $id)->first();
+        return response(['course' => $course]);
+    }
+
+    public function editCourse(Request $request)
+    {
+        $data = $request->all();
+        $course = Course::where('course_id', $data['course_id'])->Update(
+            [
+                'year_id' => $data['year_id'],
+                'major_id' => $data['major_id'],
+                'course_code' => $data['course_code'],
+                'course_title' => $data['course_title'],
+                'number_of_students' => $data['number_of_students'],
+                'marking_diffucality' => $data['marking_diffucality'],
+                'course_coordinator' => $data['course_coordinator'],
+                'have_exam' => $data['have_exam'],
+                'reviewed' => $data['reviewed'],
+            ]
+        );
+        $course = Course::findOrFail($data['course_id']);
+        $course->courses_tutors()->delete();
+        $tutors = $data['tutor'];
+        foreach ($tutors as $tutor_id) {
+            if ($tutor_id != 0) {
+                course_tutor::firstOrCreate(['tutor_id' => $tutor_id, 'course_id' => $course->course_id]);
+            }
+        }
+        return redirect('/Courses');
+    }
+
+    public function addTutor(Request $request)
+    {
+        $data = $request->all();
+        $tutor = Tutor::firstOrCreate(
+            [
+                'tutor_name' => $data['tutor_name']
+            ],
+            [
+                'position' => $data['position'],
+                'reviewed' => $data['reviewed']
+            ]
+        );
+        return redirect('/Invigilators');
+    }
+
+    public function deleteTutor(Request $request)
+    {
+        $data = $request->all();
+        $tutor = Tutor::findOrFail($data['tutor_id']);
+        $tutor->delete();
+        return redirect('/Invigilators');
+    }
+
+    public function fetchTutorData(Request $request)
+    {
+        $id = $request->id;
+        $tutor = Tutor::where('tutor_id', $id)->first();
+        return response(['tutor' => $tutor]);
+    }
+
+    public function editTutor(Request $request)
+    {
+        $data = $request->all();
+        $tutor = Tutor::where('tutor_id', $data['tutor_id'])->Update(
+            [
+                'tutor_name' => $data['tutor_name'],
+                'position' => $data['position'],
+                'reviewed' => $data['reviewed'],
+            ]
+        );
+        return redirect('/Invigilators');
+    }
+
+    public function addLab(Request $request)
+    {
+        $data = $request->all();
+        $lab = Lab::firstOrCreate(
+            [
+                'room' => $data['room'],
+                'building' => $data['building']
+            ],
+            [
+                'max_capacity' => $data['max_capacity'],
+                'available_capacity' => $data['available_capacity'],
+                'reviewed' => $data['reviewed'],
+            ]
+        );
+        return redirect('/Labs');
+    }
+
+    public function deleteLab(Request $request)
+    {
+        $data = $request->all();
+        $lab = Lab::findOrFail($data['lab_id']);
+        $lab->delete();
+        return redirect('/Labs');
+    }
+
+    public function fetchLabData(Request $request)
+    {
+        $id = $request->id;
+        //
+        $lab = Lab::where('lab_id', $id)->first();
+        // dd($lab);
+        return response(['lab' => $lab]);
+    }
+
+    public function editLab(Request $request)
+    {
+        $data = $request->all();
+        $lab = Lab::where('lab_id', $data['lab_id'])->Update(
+            [
+                'room' => $data['room'],
+                'building' => $data['building'],
+                'max_capacity' => $data['max_capacity'],
+                'available_capacity' => $data['available_capacity'],
+                'reviewed' => $data['reviewed'],
+            ]
+        );
+        return redirect('/Labs');
     }
 }

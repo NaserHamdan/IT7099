@@ -9,14 +9,14 @@
             <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                 onclick="toggleModal('Add-Courses')">Add</button>
             <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                action="{{ Route('EditCourses') }}">Edit</button>
+                onclick="toggleModal('Edit-Course')">Edit</button>
             <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                 onclick="toggleModal('Delete-Course')">Delete</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="event.preventDefault();
-                document.getElementById('gatCourses').submit();">Get Courses</button>
-                <form id="gatCourses" action="{{ route('LoadCourses') }}" method="GET" class="d-none">
-                    @csrf
-                </form>
+            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onclick="promptGetCourses()">Get Courses</button>
+            <form id="gatCourses" action="{{ route('LoadCourses') }}" method="GET" class="d-none">
+                @csrf
+            </form>
         </div>
         {{-- coursestable --}}
         <div class="flex flex-col mt-8">
@@ -244,6 +244,9 @@
                                 @endforeach
                             </select>
                         </label>
+                        <label class="hidden">
+                            <input name="reviewed" type='number' value='1' class="form-input mt-1 block w-full" required />
+                        </label>
                     </div>
                     </form>
                 </div>
@@ -264,6 +267,183 @@
         </div>
     </div>
 
+    {{-- Edit Course Modal --}}
+    <div class=" hidden overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
+        id="Edit-Course">
+        <div class="relative w-auto my-6 mx-auto max-w-none">
+            <div
+                class=" border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {{-- modal header --}}
+                <div class="flex items-start p-5 border-b border-solid border-gray-200 rounded-t">
+                    <h3 class="text-3xl font-semibold">Edit a Course</h3>
+                </div>
+                {{-- modal body --}}
+                <div class="flex flex-row relative p-6  justify-between text-left ">
+                    <div class="relative flex-col">
+                        <form name='editCourse' id='editCourse' action=" {{ route('editCourse') }}" method="post">
+                            @csrf
+                            <label class="block mt-4">
+                                <span class="text-gray-700">Course Code</span>
+                                <select name="course_id"
+                                    onchange="setValues('{{ route('fetchCourseData') }}',this.value)"
+                                    class="form-select mt-1 block w-full">
+                                    @foreach ($courses as $course)
+                                        <option value="{{ $course->course_id }}">
+                                            {{ $course->course_code . ' - ' . $course->course_title }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            <label class="block mt-4">
+                                <span class="text-gray-700">Year</span>
+                                <select id="year_id" name="year_id" class="form-select mt-1 block w-full">
+                                    @foreach ($years as $year)
+                                        <option value="{{ $year->year_id }}">{{ $year->number }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            <label class="block mt-4">
+                                <span class="text-gray-700">Major</span>
+                                <select id="major_id" name="major_id" class="form-select mt-1 block w-full">
+                                    {{-- <option>Select Major</option> --}}
+                                    @foreach ($majors as $major)
+                                        <option value="{{ $major->major_id }}">{{ $major->major_name }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            <label class="block">
+                                <span class="text-gray-700">Course Code</span>
+                                <input id="course_code" name="course_code" class="form-input mt-1 block w-full"
+                                    placeholder="IT6001" required />
+                            </label>
+
+                            <label class="block">
+                                <span class="text-gray-700">Course Title</span>
+                                <input id="course_title" name="course_title" class="form-input mt-1 block w-full"
+                                    placeholder="Computer Systems" required />
+                            </label>
+
+                            <label class="block">
+                                <span class="text-gray-700">Number of Students</span>
+                                <input id="number_of_students" name="number_of_students"
+                                    class="form-input mt-1 block w-full" type="number" placeholder="i.e 90" required />
+                            </label>
+                            <label class="block mt-4">
+                                <span class="text-gray-700">Marking Diffucality</span>
+                                <select id="marking_diffucality" name="marking_diffucality"
+                                    class="form-select mt-1 block w-full">
+                                    {{-- <option>Select Marking Diffucality</option> --}}
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </label>
+                            <label class="block mt-4">
+                                <span class="text-gray-700">Exams</span>
+                                <select id="have_exam" name="have_exam" class="form-select mt-1 block w-full">
+                                    {{-- <option>Select Exams</option> --}}
+                                    <option value="N">No Exams</option>
+                                    <option value="M">Midterm Only</option>
+                                    <option value="F">Final Only</option>
+                                    <option value="B">Both Exams</option>
+                                </select>
+                            </label>
+                            <label class="block mt-4">
+                                <span class="text-gray-700">Course Coordinator</span>
+                                <select id="course_coordinator" name="course_coordinator"
+                                    class="form-select mt-1 block w-full">
+                                    @foreach ($tutors as $tutor)
+                                        <option value="{{ $tutor->tutor_name }}">{{ $tutor->tutor_name }}</option>
+                                    @endforeach
+                                    <option value="NA">NA</option>
+                                </select>
+                            </label>
+
+                    </div>
+                    <div class="relative flex flex-col">
+                        <label class="block mt-4">
+                            <span class="text-gray-700">Number of Tutors <span class="text-gray-500">.6
+                                    max</span></span>
+                            <input id="numberOfTutorsE" name="numberOfTutors" type="number" id="numberOfTutorsE"
+                                onchange="addFieldsE()" min=1 max=6 value="1" class="form-input mt-1 block w-full"
+                                required />
+                        </label>
+
+                        <label class="block mt-4" id="tutor1E">
+                            <span class="text-gray-700">Course Tutor</span>
+                            <select name="tutor[]" id="select1E" class="form-select mt-1 block w-full">
+                                @foreach ($tutors as $tutor)
+                                    <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="block mt-4 hidden" id="tutor2E">
+                            <span class="text-gray-700">Course Tutor</span>
+                            <select name="tutor[]" id="select2E" class="form-select mt-1 block w-full">
+                                <option value="0">Select 2nd Tutor</option>
+                                @foreach ($tutors as $tutor)
+                                    <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="block mt-4 hidden" id="tutor3E">
+                            <span class="text-gray-700">Course Tutor</span>
+                            <select name="tutor[]" id="select3E" class="form-select mt-1 block w-full">
+                                <option value="0">Select 3rd Tutor</option>
+                                @foreach ($tutors as $tutor)
+                                    <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="block mt-4 hidden" id="tutor4E">
+                            <span class="text-gray-700">Course Tutor</span>
+                            <select name="tutor[]" id="select4E" class="form-select mt-1 block w-full">
+                                <option value="0">Select 4th Tutor</option>
+                                @foreach ($tutors as $tutor)
+                                    <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="block mt-4 hidden" id="tutor5E">
+                            <span class="text-gray-700">Course Tutor</span>
+                            <select name="tutor[]" id="select5E" class="form-select mt-1 block w-full">
+                                <option value="0">Select 5th Tutor</option>
+                                @foreach ($tutors as $tutor)
+                                    <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="block mt-4 hidden" id="tutor6E">
+                            <span class="text-gray-700">Course Tutor</span>
+                            <select name="tutor[]" id="select6E" class="form-select mt-1 block w-full">
+                                <option value="0">Select 6th Tutor</option>
+                                @foreach ($tutors as $tutor)
+                                    <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="hidden">
+                            <input id="reviewed" name="reviewed" type='number' value='1'
+                                class="form-input mt-1 block w-full" required />
+                        </label>
+                    </div>
+                    </form>
+                </div>
+                {{-- modal footer --}}
+                <div class="flex items-center justify-end p-6 border-t border-solid border-gray-200 rounded-b">
+                    <button
+                        class="text-blue-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button" onclick="toggleModal('Edit-Course');clearInputs('editCourse')">Close</button>
+
+                    <button
+                        class="bg-blue-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2
+                rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="submit" form="editCourse">
+                        Edit Course
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {{-- Delete Course Modal --}}
     <div class=" hidden overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
@@ -335,15 +515,73 @@
             }
         }
 
+        function addFieldsE() {
+            var numberOfTutors = document.getElementById("numberOfTutorsE");
+
+            if (numberOfTutors.value < 1) {
+                numberOfTutors.value = 1;
+            } else if (numberOfTutors.value > 6) {
+                numberOfTutors.value = 6;
+            }
+
+            for (var i = 2; i <= 6; i++) {
+                if (!document.getElementById("tutor" + i + "E").classList.contains('hidden') && i > numberOfTutors.value) {
+                    document.getElementById("tutor" + i + "E").classList.toggle('hidden');
+                    document.getElementById("select" + i + "E").setAttribute("disabled", "disabled");
+                } else if (document.getElementById("tutor" + i + "E").classList.contains('hidden') && i <= numberOfTutors
+                    .value) {
+                    document.getElementById("tutor" + i + "E").classList.toggle("hidden");
+                    document.getElementById("select" + i + "E").removeAttribute("disabled");
+                }
+            }
+        }
+
         function clearInputs(formName) {
             document.getElementById(formName).reset();
         }
 
-        function promptDelete(){
-            if (confirm("Are you sure you want to delete the course?") == true){
+        function promptDelete() {
+            if (confirm("Are you sure you want to delete the course?") == true) {
                 document.getElementById('deleteCourse').submit();
-            }else{
+            } else {
 
+            }
+        }
+
+        function promptGetCourses() {
+            if (confirm("Are you sure you want to get all unregistred courses from the database ?") == true) {
+                event.preventDefault();
+                document.getElementById('gatCourses').submit();
+            } else {
+
+            }
+        }
+
+        function setValues(url, courseId) {
+            fetch(`${url}?id=${courseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('course_code').value = data.course.course_code;
+                    document.getElementById('course_title').value = data.course.course_title;
+                    document.getElementById('number_of_students').value = data.course.number_of_students;
+                    document.getElementById('marking_diffucality').value = data.course.marking_diffucality;
+                    document.getElementById('course_coordinator').value = data.course.course_coordinator;
+                    document.getElementById('have_exam').value = data.course.have_exam;
+                    document.getElementById('reviewed').value = data.course.reviewed;
+                    document.getElementById('year_id').value = data.course.year_id;
+                    document.getElementById('major_id').value = data.course.major_id;
+                    document.getElementById('numberOfTutorsE').value = data.course.tutors.length;
+                    addFieldsE();
+                    fillFieldsE(data.course.tutors);
+                });
+        }
+
+        function fillFieldsE(tutors) {
+            var numberOfTutors = tutors.length;
+            for (var i = 1; i <= tutors.length; i++) {
+                var index = i - 1;
+                document.getElementById('select' + i + "E").value = tutors[index].tutor_id;
+                console.log(index);
             }
         }
     </script>
