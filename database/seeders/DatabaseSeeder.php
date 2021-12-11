@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             schedule_seeder::class,
             yearsSeeder::class,
-            majorsSeeder::class
+            majorsSeeder::class,
+            timeslotsSeeder::class,
         ]);
     }
 }
