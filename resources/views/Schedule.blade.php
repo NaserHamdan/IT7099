@@ -55,6 +55,9 @@
                                 $index = 0;
                             @endphp
                             @foreach ($exams as $exam)
+                                @php
+                                    $index++;
+                                @endphp
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
                                         <div class="text-sm leading-5 text-gray-500">{{ $exam->course->year->number }}
@@ -77,63 +80,87 @@
                                             {{ date('H:i', strtotime($exam->timeslot->start_time)) . ' - ' . date('H:i', strtotime($exam->timeslot->end_time)) }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">{{ count($exam->labs) }}</div>
-                                    </td>
                                     <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
                                         <div class="text-sm leading-5 text-gray-500">
-                                            @php
-                                                $index++;
-                                            @endphp
-                                            <p class="p-0 m-0" id="P-{{ $exam->exam_id }}"
-                                                onclick="showCheckboxes('I-{{ $index }}')">
+                                            <p class="p-0 m-0" id="PL-{{ $exam->exam_id }}"
+                                                onclick="showCheckboxes('L-{{ $index }}')">
                                                 @php
-                                                    $length = count($exam->tutors);
+                                                    $length = count($exam->labs);
                                                 @endphp
-                                                @if (count($exam->tutors) == 0)
+                                                @if (count($exam->labs) == 0)
                                                     <span
                                                         class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9'>
-                                                        {{ 'No Invigilators are assigned for this exam' }}
+                                                        {{ 'No Labs are assigned for this exam' }}
                                                     </span>
                                                 @else
-                                                    @foreach ($exam->tutors as $i => $tutor)
-                                                        <span
+                                                    @foreach ($exam->labs as $i => $lab)
+                                                        <span id="E{{$exam->exam_id}}L{{$lab->lab_id}}"
                                                             class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>
-                                                            {{-- @if ($i < $length - 1) --}}
-
-                                                            {{-- {{ $tutor->tutor_name . ' - ' }} --}}
-
-                                                            {{-- @else --}}
-                                                            {{ $tutor->tutor_name }}
-                                                            {{-- @endif --}}
+                                                            {{ $lab->room }}
                                                         </span>
                                                     @endforeach
                                                 @endif
-                                                <br>
-
                                             </p>
-                                            <div id="I-{{ $index }}" class=" hidden mt-2">
-                                                <select id="multi" name="tutors[]"
-                                                    onclick="updateInvigilators(this,'{{ route('updateInvigilators') }}', '{{ $exam->exam_id }}', this.value,'{{ $index }}');"
+                                            <div id="L-{{ $index }}" class=" hidden mt-2">
+                                                <select id="multi" name="labs[]"
+                                                    onclick="updateLabs(this,'{{ route('updateLabs') }}', '{{ $exam->exam_id }}', this.value);"
                                                     class="form-multiselect multi block w-full mt-1" multiple>
-                                                    @foreach ($tutors as $tutor)
-                                                        <option class="checked:bg-green-300 "
-                                                            value="{{ $tutor->tutor_id }}"
-                                                            @foreach ($exam->invigilations as $invigilation)
-                                                                @if ($invigilation->tutor_id == $tutor->tutor_id)
-                                                                    {{ 'selected' }}
-                                                                @endif
-                                                            @endforeach
-                                                    >
-                                                    {{ $tutor->tutor_name }}
-                                                    </option>
+                                                    @foreach ($labs as $lab)
+                                                        <option class="checked:bg-green-300 " value="{{ $lab->lab_id }}"
+                                                            @foreach ($exam->labs as $elab)
+                                                            @if ($elab->lab_id == $lab->lab_id)
+                                                                {{ 'selected' }}
+                                                            @endif
                                                     @endforeach
-                                                </select>
-                                            </div>
-                                    </td>
-                                </tr>
+                                                    >
+                                                    {{ $lab->room }}
+                                                    </option>
                             @endforeach
-                    </tbody>
+                            </select>
+                </div>
+                </td>
+                {{-- comment --}}
+                <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
+                    <div class="text-sm leading-5 text-gray-500">
+                        <p class="p-0 m-0" id="PI-{{ $exam->exam_id }}"
+                            onclick="showCheckboxes('I-{{ $index }}')">
+                            @php
+                                $length = count($exam->tutors);
+                            @endphp
+                            @if (count($exam->tutors) == 0)
+                                <span
+                                    class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9'>
+                                    {{ 'No Invigilators are assigned for this exam' }}
+                                </span>
+                            @else
+                                @foreach ($exam->tutors as $i => $tutor)
+                                    <span id="E{{$exam->exam_id}}T{{$tutor->tutor_id}}"
+                                        class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>
+                                        {{ $tutor->tutor_name }}
+                                    </span>
+                                @endforeach
+                            @endif
+                        </p>
+                        <div id="I-{{ $index }}" class=" hidden mt-2">
+                            <select id="multi" name="tutors[]"
+                                onclick="updateInvigilators(this,'{{ route('updateInvigilators') }}', '{{ $exam->exam_id }}', this.value);"
+                                class="form-multiselect multi block w-full mt-1" multiple>
+                                @foreach ($tutors as $tutor)
+                                    <option class="checked:bg-green-300 " value="{{ $tutor->tutor_id }}" @foreach ($exam->invigilations as $invigilation)
+                                        @if ($invigilation->tutor_id == $tutor->tutor_id)
+                                            {{ 'selected' }}
+                                        @endif
+                                @endforeach
+                                >
+                                {{ $tutor->tutor_name }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                </td>
+                </tr>
+                @endforeach
+                </tbody>
                 </table>
             </div>
         </div>
@@ -336,7 +363,7 @@
 
 
         //
-        function updateInvigilators(multi, url, examId, tutors, index) {
+        function updateInvigilators(multi, url, examId, tutors) {
             var tutors = [],
                 tutor, tutors_string = "";;
             var len = multi.options.length;
@@ -366,10 +393,7 @@
                 }
 
             }
-            // const data = {
-            //         start_date: start_date_const,
-            //         end_date: end_Date_const,
-            //     };
+
             request_string = `${url}?id=${examId}${tutors_string}`;
             fetch(request_string, {
                     method: 'get',
@@ -386,14 +410,12 @@
                     var invigilators = "";
                     if (numberOfTutors != 0) {
                         data.invigilators.forEach((invigilator, index) => {
-                            // if (index < (numberOfTutors - 1)) {
-                            //     invigilators += invigilator.tutor.tutor_name + " - ";
-                            // } else {
+
                             invigilators +=
                                 `<span id="E${examId}T${invigilator.tutor.tutor_id}" class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>`
                             invigilators += invigilator.tutor.tutor_name
                             invigilators += "</span>"
-                            // }
+
                         })
                     } else {
                         invigilators =
@@ -402,7 +424,73 @@
                     }
 
 
-                    document.getElementById(`P-${examId}`).innerHTML = invigilators;
+                    document.getElementById(`PI-${examId}`).innerHTML = invigilators;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+
+        }
+
+
+        function updateLabs(multi, url, examId, labs) {
+            var labs = [],
+                lab, labs_string = "";;
+            var len = multi.options.length;
+            var count = 0;
+            var first = true;
+            for (var i = 0; i < len; i++) {
+                lab = multi.options[i];
+                if (lab.selected) {
+                    count++;
+                }
+            }
+            for (var i = 0; i < len; i++) {
+                lab = multi.options[i];
+                if (lab.selected) {
+                    count--;
+                    labs.push(lab);
+                    if (first) {
+                        labs_string += "&"
+                        first = false;
+                    }
+                    if (count != 0) {
+                        labs_string += "labs[]=" + lab.value + "&";
+
+                    } else {
+                        labs_string += "labs[]=" + lab.value;
+                    }
+                }
+
+            }
+            request_string = `${url}?id=${examId}${labs_string}`;
+            fetch(request_string, {
+                    method: 'get',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+
+                    var numberOfLabs = data.labs.length;
+                    var labsReserved = "";
+                    if (numberOfLabs != 0) {
+                        data.labs.forEach((lab, index) => {
+                            labsReserved +=
+                                `<span id="E${examId}L${lab.lab_id}" class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>`;
+                            labsReserved += lab.labs.room;
+                            labsReserved += "</span>";
+                        })
+                    } else {
+                        labsReserved =
+                            "<span class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200  leading-9'>" +
+                            'No labs are assigned for this exam' + "</span>";
+                    }
+
+
+                    document.getElementById(`PL-${examId}`).innerHTML = labsReserved;
                 })
                 .catch((error) => {
                     console.error('Error:', error);

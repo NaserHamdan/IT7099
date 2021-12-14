@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\course_tutor;
 use App\Models\Exam;
+use App\Models\exams_labs;
 use App\Models\invigilations;
 use App\Models\Lab;
 use App\Models\Tutor;
@@ -180,6 +181,19 @@ class ApiController extends Controller
         return redirect('/Labs');
     }
 
+    public function updateLabs(Request $request)
+    {
+        $data = $request->all();
+        $exam = Exam::findOrFail($data['id']);
+        exams_labs::where(['exam_id'=>$data['id']])->delete();
+        if (isset($data['labs'])) {
+            foreach ($data['labs'] as $lab) {
+                exams_labs::create(['exam_id' => $data['id'], 'lab_id' => $lab]);
+            }
+            $labs = exams_labs::where(['exam_id' => $data['id']])->with('labs')->get();
+        }
+        return response(['labs' => $labs??array()]);
+    }
 
     public function updateInvigilators(Request $request)
     {

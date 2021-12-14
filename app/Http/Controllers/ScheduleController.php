@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\Lab;
 use App\Models\Setting;
 use App\Models\timeslot;
 use App\Models\Tutor;
@@ -18,10 +19,9 @@ class ScheduleController extends Controller
         $tutors = Tutor::all();
         $timeslots = timeslot::all();
         $courses = Course::all();
+        $labs = Lab::all();
         $setting = Setting::first();
-        // $years = Year::all();
-        //dd($exams);
-        return view('schedule', ['exams'=>$exams, 'tutors'=>$tutors,'timeslots'=>$timeslots,'courses'=>$courses,'setting'=>$setting]);
+        return view('schedule', ['exams'=>$exams, 'tutors'=>$tutors,'timeslots'=>$timeslots,'courses'=>$courses,'labs'=>$labs,'setting'=>$setting]);
     }
 
 }

@@ -77,3 +77,6 @@ Route::post('/addExam', [ApiController::class, 'addExam'])->name('addExam')->mid
 Route::post('/deleteExam', [ApiController::class, 'deleteExam'])->name('deleteExam')->middleware('auth');
 //
 Route::post('/updateSettings', [SettingController::class, 'updateSettings'])->name('updateSettings')->middleware('auth');
+
+//
+Route::get('/updateLabs', [ApiController::class, 'updateLabs'])->name('updateLabs')->middleware('auth');

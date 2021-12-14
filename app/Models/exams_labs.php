@@ -11,6 +11,10 @@ class exams_labs extends Model
 
     protected $table = "exams_labs";
     public $timestamps = false;
+    protected $fillable = [
+        'exam_id',
+        'lab_id'
+    ];
     public function labs(){
         return $this->belongsTo(Lab::class,'lab_id','lab_id');
     }
