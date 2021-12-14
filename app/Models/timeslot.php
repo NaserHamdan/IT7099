@@ -5,13 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class exams_labs extends Model
+class timeslot extends Model
 {
     use HasFactory;
 
-    protected $table = "exams_labs";
+    protected $table="timeslots";
     public $timestamps = false;
-    public function labs(){
-        return $this->belongsTo(Lab::class,'lab_id','lab_id');
-    }
 }

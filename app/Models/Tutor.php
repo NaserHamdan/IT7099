@@ -19,7 +19,7 @@ class Tutor extends Model
     ];
 
     public function invigilations(){
-        return $this->hasMany(inviligations::class,'tutor_id','tutor_id');
+        return $this->hasMany(invigilations::class,'tutor_id','tutor_id');
     }
 
 

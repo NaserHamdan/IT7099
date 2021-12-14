@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\course_tutor;
+use App\Models\Exam;
+use App\Models\invigilations;
 use App\Models\Lab;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
@@ -176,5 +178,43 @@ class ApiController extends Controller
             ]
         );
         return redirect('/Labs');
+    }
+
+
+    public function updateInvigilators(Request $request)
+    {
+        $data = $request->all();
+        $exam = Exam::findOrFail($data['id']);
+        $exam->invigilations()->delete();
+        if (isset($data['tutors'])) {
+            foreach ($data['tutors'] as $tutor) {
+                invigilations::create(['exam_id' => $data['id'], 'tutor_id' => $tutor, 'invigilation_type' => 'S', 'room' => 0]);
+            }
+            $invigilators = invigilations::where(['exam_id' => $data['id']])->with('tutor')->get();
+        }
+        return response(['invigilators' => $invigilators??array()]);
+    }
+
+    public function addExam(Request $request)
+    {
+        $data = $request->all();
+        $exam = Exam::firstOrCreate(
+            [
+                'course_id' => $data['course_id'],
+            ],
+            [
+                'timeslot_id' => $data['timeslot_id'],
+                'date' => $data['date'],
+            ]
+        );
+        return redirect('/Schedule');
+    }
+
+    public function deleteExam(Request $request)
+    {
+        $data = $request->all();
+        $exam = Exam::findOrFail($data['exam_id']);
+        $exam->delete();
+        return redirect('/Schedule');
     }
 }

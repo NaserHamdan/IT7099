@@ -9,6 +9,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LinkingController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,3 +69,11 @@ Route::post('/addLab', [ApiController::class, 'addLab'])->name('addLab')->middle
 Route::post('/deleteLab', [ApiController::class, 'deleteLab'])->name('deleteLab')->middleware('auth');
 Route::get('/fetchLabData', [ApiController::class, 'fetchLabData'])->name('fetchLabData')->middleware('auth');
 Route::post('/editLab', [ApiController::class, 'editLab'])->name('editLab')->middleware('auth');
+
+////
+Route::get('/updateInvigilators', [ApiController::class, 'updateInvigilators'])->name('updateInvigilators')->middleware('auth');
+//
+Route::post('/addExam', [ApiController::class, 'addExam'])->name('addExam')->middleware('auth');
+Route::post('/deleteExam', [ApiController::class, 'deleteExam'])->name('deleteExam')->middleware('auth');
+//
+Route::post('/updateSettings', [SettingController::class, 'updateSettings'])->name('updateSettings')->middleware('auth');
