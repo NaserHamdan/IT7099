@@ -46,4 +46,9 @@ class LabsController extends Controller
         }
         return redirect('/Labs');
     }
+
+    public function getAllLabs(Request $request){
+        $labs = Lab::all();
+        return response(['labs' => $labs]);
+    }
 }

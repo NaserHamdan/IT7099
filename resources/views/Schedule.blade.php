@@ -15,8 +15,8 @@
             <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="">Generate
                 Timetable</button>
             <label class="bg-gray-500 text-white font-bold p-0 m-0 py-2 px-4 rounded" for="start_date">Start Date</label>
-            <input id="start_date" value="{{ $setting->start_date ?? ' ' }}" name="start_date" min="{{ date('Y-m-d') }}"
-                type="date" class="form-input font-bold py-2 px-4 rounded" required />
+            <input id="start_date" value="" name="start_date" min="{{ date('Y-m-d') }}" type="date"
+                class="form-input font-bold py-2 px-4 rounded" required />
         </div>
         {{-- courses table --}}
         <div class="flex flex-col mt-8">
@@ -94,8 +94,8 @@
                                                     </span>
                                                 @else
                                                     @foreach ($exam->labs as $i => $lab)
-                                                        <span id="E{{$exam->exam_id}}L{{$lab->lab_id}}"
-                                                            class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>
+                                                        <span id="E{{ $exam->exam_id }}L{{ $lab->lab_id }}"
+                                                            class='border-2 rounded-lg p-1 mr-1 leading-9'>
                                                             {{ $lab->room }}
                                                         </span>
                                                     @endforeach
@@ -103,10 +103,10 @@
                                             </p>
                                             <div id="L-{{ $index }}" class=" hidden mt-2">
                                                 <select id="multi" name="labs[]"
-                                                    onclick="updateLabs(this,'{{ route('updateLabs') }}', '{{ $exam->exam_id }}', this.value);"
+                                                    onclick="updateLabs(this,'{{ route('updateLabs') }}', '{{ $exam->exam_id }}');"
                                                     class="form-multiselect multi block w-full mt-1" multiple>
                                                     @foreach ($labs as $lab)
-                                                        <option class="checked:bg-green-300 " value="{{ $lab->lab_id }}"
+                                                        <option class="" value="{{ $lab->lab_id }}"
                                                             @foreach ($exam->labs as $elab)
                                                             @if ($elab->lab_id == $lab->lab_id)
                                                                 {{ 'selected' }}
@@ -134,8 +134,8 @@
                                 </span>
                             @else
                                 @foreach ($exam->tutors as $i => $tutor)
-                                    <span id="E{{$exam->exam_id}}T{{$tutor->tutor_id}}"
-                                        class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>
+                                    <span id="E{{ $exam->exam_id }}T{{ $tutor->tutor_id }}"
+                                        class='border-2 rounded-lg p-1 mr-1 leading-9'>
                                         {{ $tutor->tutor_name }}
                                     </span>
                                 @endforeach
@@ -143,7 +143,7 @@
                         </p>
                         <div id="I-{{ $index }}" class=" hidden mt-2">
                             <select id="multi" name="tutors[]"
-                                onclick="updateInvigilators(this,'{{ route('updateInvigilators') }}', '{{ $exam->exam_id }}', this.value);"
+                                onclick="updateInvigilators(this,'{{ route('updateInvigilators') }}', '{{ $exam->exam_id }}');"
                                 class="form-multiselect multi block w-full mt-1" multiple>
                                 @foreach ($tutors as $tutor)
                                     <option class="checked:bg-green-300 " value="{{ $tutor->tutor_id }}" @foreach ($exam->invigilations as $invigilation)
@@ -334,25 +334,25 @@
         </div>
     </div>
     <script type="text/javascript">
+        // A function for toggleling modals on and off along with the backdrop using modal id
         function toggleModal(modalID) {
             document.getElementById(modalID).classList.toggle("hidden");
             document.getElementById("backdrop").classList.toggle("hidden");
             document.getElementById(modalID).classList.toggle("flex");
             document.getElementById("backdrop").classList.toggle("flex");
         }
-
+        // a function to clear forms on modal close
         function clearInputs(formName) {
             document.getElementById(formName).reset();
         }
-
+        // a function that propmt the user if he wants to delete an exam
         function promptDelete() {
             if (confirm("Are you sure you want to delete the exam?") == true) {
                 document.getElementById('deleteExam').submit();
-            } else {
-
-            }
+            } else {}
         }
 
+        //set values for edit exam -------- need editing
         function setValues(url, examId) {
             fetch(`${url}?id=${examId}`)
                 .then(response => response.json())
@@ -361,9 +361,8 @@
                 });
         }
 
-
-        //
-        function updateInvigilators(multi, url, examId, tutors) {
+        //update exam invigilators on select from multi select
+        function updateInvigilators(multi, url, examId) {
             var tutors = [],
                 tutor, tutors_string = "";;
             var len = multi.options.length;
@@ -412,7 +411,7 @@
                         data.invigilators.forEach((invigilator, index) => {
 
                             invigilators +=
-                                `<span id="E${examId}T${invigilator.tutor.tutor_id}" class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>`
+                                `<span id="E${examId}T${invigilator.tutor.tutor_id}" class='border-2 rounded-lg p-1 mr-1 leading-9'>`
                             invigilators += invigilator.tutor.tutor_name
                             invigilators += "</span>"
 
@@ -430,10 +429,11 @@
                     console.error('Error:', error);
                 });
 
+                checkInvigilatorsConflicts();
         }
 
-
-        function updateLabs(multi, url, examId, labs) {
+        //update exam labs on select from multi select
+        function updateLabs(multi, url, examId) {
             var labs = [],
                 lab, labs_string = "";;
             var len = multi.options.length;
@@ -479,7 +479,7 @@
                     if (numberOfLabs != 0) {
                         data.labs.forEach((lab, index) => {
                             labsReserved +=
-                                `<span id="E${examId}L${lab.lab_id}" class='border-2 border-green-200 rounded-lg p-1 mr-1 bg-green-100 hover:bg-green-200 leading-9'>`;
+                                `<span id="E${examId}L${lab.lab_id}" class='border-2 rounded-lg p-1 mr-1 leading-9'>`;
                             labsReserved += lab.labs.room;
                             labsReserved += "</span>";
                         })
@@ -495,15 +495,17 @@
                 .catch((error) => {
                     console.error('Error:', error);
                 });
-
+            checkLabsConflicts();
         }
 
+        //show the mutliseelct for the specfic exam
         function showCheckboxes(id) {
             var checkboxes = document.getElementById(id);
 
             checkboxes.classList.toggle("hidden");
         }
 
+        //allow multi selecting whithout clicking on CTRL
         $("select.multi").mousedown(function(e) {
             e.preventDefault();
 
@@ -521,8 +523,20 @@
             e.preventDefault()
         });
 
-        var start_date_default = "{{ $setting->start_date }}";
-        var end_date_default = "{{ $setting->end_date }}";
+        //get start date and end date of the schedule from php
+        var start_date_default = "{{ $setting->start_date ?? ' ' }}";
+        var end_date_default = "{{ $setting->end_date ?? ' ' }}";
+        //set the start date as the default passed from php
+        function setDate() {
+            document.getElementById('start_date').value = start_date_default;
+        }
+        //set values on page load
+        $(document).ready(function() {
+            setDate();
+            checkLabsConflicts();
+            checkInvigilatorsConflicts();
+        });
+        //if the date is changed and it's a sunday, update the start date and end date on the settings
         document.getElementById("start_date").onchange = function() {
             var date = new Date(this.value);
             var end = new Date();
@@ -558,6 +572,238 @@
                     });
             }
         };
+
+
+        function checkLabsConflicts() {
+            fetch("{{ route('getAllExamsLabs') }}", {
+                    method: 'get',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    //Clear All
+                    data.exams.forEach(exam => {
+                        data.labs.forEach(lab => {
+                            var labObject = document.getElementById(`E${exam.exam_id}L${lab.lab_id}`);
+                            if (labObject != null) {
+                                markClear(labObject);
+                            }
+                        });
+                    });
+                    numberOfExams = data.exams.length;
+                    console.log(numberOfExams);
+                    var examLabs = [];
+                    var count = 0;
+                    var conf = [];
+                    var confExam = [];
+                    data.exams.forEach((exam, index) => {
+                        data.exams.forEach((eexam, eindex) => {
+                            if (exam.exam_id != eexam.exam_id && exam.timeslot_id == eexam
+                                .timeslot_id && exam.date == eexam.date) {
+                                console.log(exam.exam_id + "X" + eexam.exam_id)
+                                exam.labs.forEach(lab => {
+                                    examLabs.push(lab.lab_id);
+                                });
+                                eexam.labs.forEach(lab => {
+                                    examLabs.push(lab.lab_id);
+                                });
+                                findDuplicates(examLabs).forEach(conflict => {
+                                    conf.push(conflict)
+                                })
+                                confExam.push(exam.exam_id);
+                                confExam.push(eexam.exam_id);
+                            }
+                        });
+                        examLabs = [];
+                        conf = toUniqueArray(conf);
+                        confExam = toUniqueArray(confExam);
+                        confExam.forEach(exam_id => {
+                            conf.forEach(lab_id => {
+                                var labObject =
+                                    document.getElementById(`E${exam_id}L${lab_id}`);
+                                if (labObject != null) {
+                                    markConflict(labObject);
+                                }
+                            });
+                        });
+                        conf = [];
+                        confExam = [];
+                    });
+                    data.exams.forEach(exam => {
+                        data.labs.forEach(lab => {
+                            var labObject = document.getElementById(`E${exam.exam_id}L${lab.lab_id}`);
+                            if (labObject != null) {
+                                markClearAfter(labObject);
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function checkInvigilatorsConflicts() {
+            fetch("{{ route('getAllExamsTutors') }}", {
+                    method: 'get',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    //Clear All
+                    data.exams.forEach(exam => {
+                        data.tutors.forEach(tutor => {
+                            var tutorObject = document.getElementById(`E${exam.exam_id}T${tutor.tutor_id}`);
+                            if (tutorObject != null) {
+                                markClear(tutorObject);
+                            }
+                        });
+                    });
+                    numberOfExams = data.exams.length;
+                    console.log(numberOfExams);
+                    var examTutors = [];
+                    var count = 0;
+                    var conf = [];
+                    var confExam = [];
+                    data.exams.forEach((exam, index) => {
+                        data.exams.forEach((eexam, eindex) => {
+                            if (exam.exam_id != eexam.exam_id && exam.timeslot_id == eexam
+                                .timeslot_id && exam.date == eexam.date) {
+                                console.log(exam.exam_id + "X" + eexam.exam_id)
+                                exam.tutors.forEach(tutor => {
+                                    examTutors.push(tutor.tutor_id);
+                                });
+                                eexam.tutors.forEach(tutor => {
+                                    examTutors.push(tutor.tutor_id);
+                                });
+                                findDuplicates(examTutors).forEach(conflict => {
+                                    conf.push(conflict)
+                                })
+                                confExam.push(exam.exam_id);
+                                confExam.push(eexam.exam_id);
+                            }
+                        });
+                        examTutors = [];
+                        conf = toUniqueArray(conf);
+                        confExam = toUniqueArray(confExam);
+                        confExam.forEach(exam_id => {
+                            conf.forEach(tutor_id => {
+                                var tutorObject =
+                                    document.getElementById(`E${exam_id}T${tutor_id}`);
+                                if (tutorObject != null) {
+                                    markConflict(tutorObject);
+                                }
+                            });
+                        });
+                        conf = [];
+                        confExam = [];
+                    });
+                    data.exams.forEach(exam => {
+                        data.tutors.forEach(tutor => {
+                            var tutorObject = document.getElementById(`E${exam.exam_id}T${tutor.tutor_id}`);
+                            if (tutorObject != null) {
+                                markClearAfter(tutorObject);
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function isMarkedConflict(obj) {
+            if (obj.classList.contains('bg-red-100')) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function isMarkedClear(obj) {
+            if (obj.classList.contains('bg-green-100')) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function markConflict(obj) {
+            if (!isMarkedConflict(obj)) {
+                conflict(obj);
+            }
+            if (isMarkedClear(obj)) {
+                notClear(obj);
+            }
+        }
+
+        function markClear(obj) {
+            if (!isMarkedClear(obj)) {
+                clear(obj);
+            }
+            if (isMarkedConflict(obj)) {
+                notConflict(obj);
+            }
+        }
+
+        function markClearAfter(obj) {
+            if (!isMarkedClear(obj) && !isMarkedConflict(obj)) {
+                clear(obj);
+            }
+        }
+
+        function conflict(obj) {
+            obj.classList.add('border-red-200');
+            obj.classList.add('bg-red-100');
+            obj.classList.add('hover:bg-red-200');
+        }
+
+        function notConflict(obj) {
+            obj.classList.remove('border-red-200');
+            obj.classList.remove('bg-red-100');
+            obj.classList.remove('hover:bg-red-200');
+        }
+
+        function clear(obj) {
+            obj.classList.add('border-green-200');
+            obj.classList.add('bg-green-100');
+            obj.classList.add('hover:bg-green-200');
+        }
+
+        function notClear(obj) {
+            obj.classList.remove('border-green-200');
+            obj.classList.remove('bg-green-100');
+            obj.classList.remove('hover:bg-green-200');
+        }
+
+
+
+        function findDuplicates(arr) {
+            arr = arr.slice().sort();
+            let results = [];
+            for (let i = 0; i < arr.length - 1; i++) {
+                if (arr[i + 1] == arr[i]) {
+                    results.push(arr[i]);
+                }
+            }
+            return results;
+        }
+
+        function toUniqueArray(arr) {
+            var newArr = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (newArr.indexOf(arr[i]) === -1) {
+                    newArr.push(arr[i]);
+                }
+            }
+            return newArr;
+        }
     </script>
 
     <style>

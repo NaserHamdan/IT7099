@@ -231,4 +231,5 @@ class ApiController extends Controller
         $exam->delete();
         return redirect('/Schedule');
     }
+
 }

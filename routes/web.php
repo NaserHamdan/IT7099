@@ -80,3 +80,7 @@ Route::post('/updateSettings', [SettingController::class, 'updateSettings'])->na
 
 //
 Route::get('/updateLabs', [ApiController::class, 'updateLabs'])->name('updateLabs')->middleware('auth');
+Route::get('/getAllLabs', [LabsController::class, 'getAllLabs'])->name('getAllLabs')->middleware('auth');
+//
+Route::get('/getAllExamsLabs', [ScheduleController::class, 'getAllExamsLabs'])->name('getAllExamsLabs')->middleware('auth');
+Route::get('/getAllExamsTutors', [ScheduleController::class, 'getAllExamsTutors'])->name('getAllExamsTutors')->middleware('auth');
