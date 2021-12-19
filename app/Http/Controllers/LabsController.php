@@ -12,7 +12,13 @@ class LabsController extends Controller
     public function Labs()
     {
         $labs = Lab::with('exams_labs')->get();
-        return view('labs', ['labs' => $labs]);
+        $count = 0;
+        foreach($labs as $lab){
+            if($lab->reviewed == 0){
+                $count++;
+            }
+        }
+        return view('labs', ['labs' => $labs,'count'=>$count]);
     }
 
     public function LoadLabs(Request $request)
@@ -50,5 +56,19 @@ class LabsController extends Controller
     public function getAllLabs(Request $request){
         $labs = Lab::all();
         return response(['labs' => $labs]);
+    }
+
+    public function updateLabs(Request $request){
+        $data = $request->all();
+        for($i=1;$i<=$data['count'];$i++){
+            Lab::where(['lab_id'=>$data['lab_id'.$i]])->update([
+                'room' => $data['room'.$i],
+                'building' => $data['building'.$i],
+                'max_capacity' => $data['max_capacity'.$i],
+                'available_capacity' => $data['available_capacity'.$i],
+                'reviewed' => 1,
+            ]);
+        }
+        return redirect('/Labs');
     }
 }

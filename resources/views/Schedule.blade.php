@@ -1,30 +1,75 @@
 @extends('Layouts.app')
 @section('title', 'Schedule')
 @section('content')
+    @php
+
+    $url = $_SERVER['REQUEST_URI'];
+    if (isset(parse_url($url)['query'])) {
+        $query = parse_url($url)['query'];
+        $sort = explode('&', $query)[0];
+        $column = explode('=', $sort)[0];
+        $order = explode('=', $sort)[1];
+        if (isset($_GET[$column])) {
+            if ($_GET[$column] == 'asc') {
+                $exams = $exams->sortby($column);
+            } elseif ($_GET[$column] == 'desc') {
+                $exams = $exams->sortByDesc($column);
+            }
+        }
+    }
+    @endphp
     {{-- backdrop for modals --}}
     <div class="hidden opacity-25 fixed inset-0 z-40 bg-black" id="backdrop"></div>
     {{-- button options --}}
     <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-5 flex-row">
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+        <div class="flex items-center gap-3 flex-row">
+            <button
+                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Add-Exam')">Add</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <button
+                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Edit-Exam')">Edit</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <button
+                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Delete-Exam')">Delete</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="">Generate
-                Timetable</button>
-            <label class="bg-gray-500 text-white font-bold p-0 m-0 py-2 px-4 rounded" for="start_date">Start Date</label>
+            <div class="dropdown relative">
+                <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg></button>
+                <div id="sortByDropDown"
+                    class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                    <ul
+                        class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
+                        <li>
+                            <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                href="#" onclick="sortBy('date')">Date</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                href="#" onclick="sortBy('timeslot_id')">Timeslot</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <button
+                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                onclick="downloadPdf()">Print/Export</button>
+            <label
+                class="text-white m-0 bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                for="start_date">Start Date</label>
             <input id="start_date" value="" name="start_date" min="{{ date('Y-m-d') }}" type="date"
                 class="form-input font-bold py-2 px-4 rounded" required />
         </div>
         {{-- courses table --}}
-        <div class="flex flex-col mt-8">
+        <div id="table" class="flex flex-col mt-8 print:landscape">
             <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
                 <div
                     class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
                     <table class="min-w-full">
-                        <thead>
+                        <thead class="table-row-group">
                             <tr>
                                 <th
                                     class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
@@ -67,7 +112,7 @@
                                         <div class="text-sm leading-5 text-gray-500">
                                             {{ $exam->course->major->major_name }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                                    <td class="px-6 border-b border-gray-200">
                                         <div class="text-sm leading-5 text-gray-500">
                                             {{ $exam->course->course_code . ' - ' . $exam->course->course_title }}</div>
                                     </td>
@@ -75,7 +120,7 @@
                                         <div class="text-sm leading-5 text-gray-500">
                                             {{ date('l d/m/Y', strtotime($exam->date)) }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                                    <td class="px-6 py-4 whitespace-normal border-b border-gray-200">
                                         <div class="text-sm leading-5 text-gray-500">
                                             {{ date('H:i', strtotime($exam->timeslot->start_time)) . ' - ' . date('H:i', strtotime($exam->timeslot->end_time)) }}
                                         </div>
@@ -89,13 +134,13 @@
                                                 @endphp
                                                 @if (count($exam->labs) == 0)
                                                     <span
-                                                        class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9'>
+                                                        class='border-2 border-yellow-200 rounded-lg p-1 cursor-pointer mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9 '>
                                                         {{ 'No Labs are assigned for this exam' }}
                                                     </span>
                                                 @else
                                                     @foreach ($exam->labs as $i => $lab)
                                                         <span id="E{{ $exam->exam_id }}L{{ $lab->lab_id }}"
-                                                            class='border-2 rounded-lg p-1 mr-1 leading-9'>
+                                                            class='border-2 rounded-lg p-1 mr-1 leading-9 cursor-pointer'>
                                                             {{ $lab->room }}
                                                         </span>
                                                     @endforeach
@@ -104,7 +149,7 @@
                                             <div id="L-{{ $index }}" class=" hidden mt-2">
                                                 <select id="multi" name="labs[]"
                                                     onclick="updateLabs(this,'{{ route('updateLabs') }}', '{{ $exam->exam_id }}');"
-                                                    class="form-multiselect multi block w-full mt-1" multiple>
+                                                    class="form-multiselect multi block w-full mt-1 " multiple>
                                                     @foreach ($labs as $lab)
                                                         <option class="" value="{{ $lab->lab_id }}"
                                                             @foreach ($exam->labs as $elab)
@@ -129,13 +174,13 @@
                             @endphp
                             @if (count($exam->tutors) == 0)
                                 <span
-                                    class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9'>
+                                    class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9 cursor-pointer'>
                                     {{ 'No Invigilators are assigned for this exam' }}
                                 </span>
                             @else
                                 @foreach ($exam->tutors as $i => $tutor)
                                     <span id="E{{ $exam->exam_id }}T{{ $tutor->tutor_id }}"
-                                        class='border-2 rounded-lg p-1 mr-1 leading-9'>
+                                        class='border-2 rounded-lg p-1 mr-1 leading-9 cursor-pointer'>
                                         {{ $tutor->tutor_name }}
                                     </span>
                                 @endforeach
@@ -341,6 +386,55 @@
             document.getElementById(modalID).classList.toggle("flex");
             document.getElementById("backdrop").classList.toggle("flex");
         }
+
+        function sortBy(column) {
+            if (getQueryVariable(`${column}`) == -1) {
+                window.location.replace(`{{ route('Schedule') }}?${column}=asc`);
+            } else if (getQueryVariable(`${column}`) == 'asc') {
+                window.location.replace(`{{ route('Schedule') }}?${column}=desc`);
+            } else {
+                window.location.replace("{{ route('Schedule') }}");
+            }
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return -1; //not found
+        }
+
+        function toggleDropDown(dropDownID) {
+            document.getElementById(dropDownID).classList.toggle("hidden");
+            document.getElementById(dropDownID).classList.toggle("flex");
+        }
+
+        function downloadPdf() {
+            var count = {{ count($exams) }};
+            for (i = 0; i < count; i++) {
+                lab = document.getElementById('L-' + i);
+                tutor = document.getElementById('I-' + i);
+                if (lab != null && !lab.classList.contains('hidden')) {
+                    lab.classList.add('hidden');
+                }
+                if (tutor != null && !tutor.classList.contains('hidden')) {
+                    tutor.classList.add('hidden');
+                }
+            }
+            var printContents = document.getElementById('table').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+        }
         // a function to clear forms on modal close
         function clearInputs(formName) {
             document.getElementById(formName).reset();
@@ -405,20 +499,19 @@
                 .then(data => {
 
                     var numberOfTutors = data.invigilators.length;
-                    console.log(numberOfTutors);
                     var invigilators = "";
                     if (numberOfTutors != 0) {
                         data.invigilators.forEach((invigilator, index) => {
 
                             invigilators +=
-                                `<span id="E${examId}T${invigilator.tutor.tutor_id}" class='border-2 rounded-lg p-1 mr-1 leading-9'>`
+                                `<span id="E${examId}T${invigilator.tutor.tutor_id}" class='border-2 rounded-lg p-1 mr-1 leading-9 cursor-pointer'>`
                             invigilators += invigilator.tutor.tutor_name
                             invigilators += "</span>"
 
                         })
                     } else {
                         invigilators =
-                            "<span class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200  leading-9'>" +
+                            "<span class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200  leading-9 cursor-pointer'>" +
                             'No Invigilators are assigned for this exam' + "</span>";
                     }
 
@@ -429,7 +522,7 @@
                     console.error('Error:', error);
                 });
 
-                checkInvigilatorsConflicts();
+            checkInvigilatorsConflicts();
         }
 
         //update exam labs on select from multi select
@@ -479,13 +572,13 @@
                     if (numberOfLabs != 0) {
                         data.labs.forEach((lab, index) => {
                             labsReserved +=
-                                `<span id="E${examId}L${lab.lab_id}" class='border-2 rounded-lg p-1 mr-1 leading-9'>`;
+                                `<span id="E${examId}L${lab.lab_id}" class='border-2 rounded-lg p-1 mr-1 leading-9 cursor-pointer'>`;
                             labsReserved += lab.labs.room;
                             labsReserved += "</span>";
                         })
                     } else {
                         labsReserved =
-                            "<span class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200  leading-9'>" +
+                            "<span class='border-2 border-yellow-200 rounded-lg p-1 mr-1 bg-yellow-100 hover:bg-yellow-200  leading-9 cursor-pointer'>" +
                             'No labs are assigned for this exam' + "</span>";
                     }
 
@@ -594,7 +687,6 @@
                         });
                     });
                     numberOfExams = data.exams.length;
-                    console.log(numberOfExams);
                     var examLabs = [];
                     var count = 0;
                     var conf = [];
@@ -603,7 +695,6 @@
                         data.exams.forEach((eexam, eindex) => {
                             if (exam.exam_id != eexam.exam_id && exam.timeslot_id == eexam
                                 .timeslot_id && exam.date == eexam.date) {
-                                console.log(exam.exam_id + "X" + eexam.exam_id)
                                 exam.labs.forEach(lab => {
                                     examLabs.push(lab.lab_id);
                                 });
@@ -659,14 +750,14 @@
                     //Clear All
                     data.exams.forEach(exam => {
                         data.tutors.forEach(tutor => {
-                            var tutorObject = document.getElementById(`E${exam.exam_id}T${tutor.tutor_id}`);
+                            var tutorObject = document.getElementById(
+                                `E${exam.exam_id}T${tutor.tutor_id}`);
                             if (tutorObject != null) {
                                 markClear(tutorObject);
                             }
                         });
                     });
                     numberOfExams = data.exams.length;
-                    console.log(numberOfExams);
                     var examTutors = [];
                     var count = 0;
                     var conf = [];
@@ -675,7 +766,6 @@
                         data.exams.forEach((eexam, eindex) => {
                             if (exam.exam_id != eexam.exam_id && exam.timeslot_id == eexam
                                 .timeslot_id && exam.date == eexam.date) {
-                                console.log(exam.exam_id + "X" + eexam.exam_id)
                                 exam.tutors.forEach(tutor => {
                                     examTutors.push(tutor.tutor_id);
                                 });
@@ -706,7 +796,8 @@
                     });
                     data.exams.forEach(exam => {
                         data.tutors.forEach(tutor => {
-                            var tutorObject = document.getElementById(`E${exam.exam_id}T${tutor.tutor_id}`);
+                            var tutorObject = document.getElementById(
+                                `E${exam.exam_id}T${tutor.tutor_id}`);
                             if (tutorObject != null) {
                                 markClearAfter(tutorObject);
                             }
@@ -809,6 +900,10 @@
     <style>
         select.multi[multiple]:focus option:checked {
             background: linear-gradient(0deg, green 0%, green 100%);
+        }
+
+        thead {
+            display: table-row-group;
         }
 
     </style>

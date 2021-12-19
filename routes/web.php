@@ -54,16 +54,19 @@ Route::get('/LoadTutors', [InvigilatorsController::class, 'loadtutors'])->name('
 Route::get('/LoadLabs', [LabsController::class, 'loadlabs'])->name('LoadLabs')->middleware('auth');
 Route::get('/LoadCourses', [CourseController::class, 'loadcourses'])->name('LoadCourses')->middleware('auth');
 Route::get('/LinkTutors', [LinkingController::class, 'linkCoursesTutors'])->name('LinkTutors')->middleware('auth');
+Route::post('/updateLabs', [LabsController::class, 'updateLabs'])->name('updateLabs')->middleware('auth');
 //api
 Route::post('/addCourse', [ApiController::class, 'addCourse'])->name('addCourse')->middleware('auth');
 Route::post('/deleteCourse', [ApiController::class, 'deleteCourse'])->name('deleteCourse')->middleware('auth');
 Route::get('/fetchCourseData', [ApiController::class, 'fetchCourseData'])->name('fetchCourseData')->middleware('auth');
 Route::post('/editCourse', [ApiController::class, 'editCourse'])->name('editCourse')->middleware('auth');
+Route::post('/updateCourses', [CourseController::class, 'updateCourses'])->name('updateCourses')->middleware('auth');
 //
 Route::post('/addTutor', [ApiController::class, 'addTutor'])->name('addTutor')->middleware('auth');
 Route::post('/deleteTutor', [ApiController::class, 'deleteTutor'])->name('deleteTutor')->middleware('auth');
 Route::get('/fetchTutorData', [ApiController::class, 'fetchTutorData'])->name('fetchTutorData')->middleware('auth');
 Route::post('/editTutor', [ApiController::class, 'editTutor'])->name('editTutor')->middleware('auth');
+Route::post('/updateTutors', [InvigilatorsController::class, 'updateTutors'])->name('updateTutors')->middleware('auth');
 //
 Route::post('/addLab', [ApiController::class, 'addLab'])->name('addLab')->middleware('auth');
 Route::post('/deleteLab', [ApiController::class, 'deleteLab'])->name('deleteLab')->middleware('auth');

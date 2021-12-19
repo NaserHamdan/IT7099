@@ -1,19 +1,57 @@
 @extends('Layouts.app')
 @section('title', 'Labs')
 @section('content')
+@php
+$url = $_SERVER['REQUEST_URI'];
+if (isset(parse_url($url)['query'])) {
+    $query = parse_url($url)['query'];
+    $sort = explode('&', $query)[0];
+    $column = explode('=', $sort)[0];
+    $order = explode('=', $sort)[1];
+    if (isset($_GET[$column])) {
+        if ($_GET[$column] == 'asc') {
+            $labs = $labs->sortby($column);
+        } elseif ($_GET[$column] == 'desc') {
+            $labs = $labs->sortByDesc($column);
+        }
+    }
+}
 
+@endphp
     {{-- backdrop for modals --}}
     <div class="hidden opacity-25 fixed inset-0 z-40 bg-black" id="backdrop"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+    <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3 flex-row">
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Add-Lab')">Add</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Edit-Lab')">Edit</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Delete-Lab')">Delete</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                <div class="dropdown relative">
+                    <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
+                        class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                        type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg></button>
+                    <div id="sortByDropDown"
+                        class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                        <ul
+                            class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
+                            <li>
+                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                    href="#" onclick="sortBy('room')">Room</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                    href="#" onclick="sortBy('building')">Building</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="promptGetLabs()">Get Labs</button>
             <form id="gatLabs" action="{{ route('LoadLabs') }}" method="GET" class="d-none">
                 @csrf
@@ -242,6 +280,78 @@
     </div>
 
 
+
+    {{-- Review lab Modal --}}
+    <div class=" hidden overflow-x-hidden overflow-y-auto mt-10 fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
+        id="Review-Lab">
+        <div class="relative w-auto my-auto mx-auto max-w-none">
+            <div
+                class=" border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {{-- modal header --}}
+                <div class="flex items-start p-5 border-b border-solid border-gray-200 rounded-t">
+                    <h3 class="text-3xl font-semibold">Review Labs</h3>
+                </div>
+                {{-- modal body --}}
+                <div class="flex flex-col relative p-6  justify-between text-left ">
+                    <form name='reviewLab' id='reviewLab' action="{{route('updateLabs')}}" method="post">
+                        @csrf
+                        @php
+                            $index = 1;
+                        @endphp
+                        @foreach ($labs as $lab)
+                            @if ($lab->reviewed == 0)
+                                <h6 class="font-semibold">Lab {{$index}}</h6>
+                                <input type="hidden" name="lab_id{{$index}}" value="{{$lab->lab_id}}" />
+                                <label class="block">
+                                    <span class="text-gray-700">Lab room</span>
+                                    <input name="room{{$index}}" class="form-input mt-1 block w-full" placeholder="36.124"
+                                        value="{{ $lab->room }}" required />
+                                </label>
+
+                                <label class="block">
+                                    <span class="text-gray-700">Building</span>
+                                    <input name="building{{$index}}" class="form-input mt-1 block w-full" placeholder="BLDG36"
+                                        value="{{ $lab->building }}" required />
+                                </label>
+
+                                <label class="block">
+                                    <span class="text-gray-700">Max Capacity</span>
+                                    <input name="max_capacity{{$index}}" type="number" class="form-input mt-1 block w-full"
+                                        value="{{ $lab->max_capacity }}" placeholder="20" required />
+                                </label>
+
+                                <label class="block">
+                                    <span class="text-gray-700">Available capacity</span>
+                                    <input name="available_capacity{{$index}}" type="number" class="form-input mt-1 block w-full"
+                                        value="{{ $lab->available_capacity }}" placeholder="15" required />
+                                </label>
+                                <hr />
+                                @php
+                                    $index++;
+                                @endphp
+                            @endif
+                        @endforeach
+                        <input type='hidden' name="count" value="{{$index-1}}"/>
+                    </form>
+                </div>
+                {{-- modal footer --}}
+                <div class="flex items-center justify-end p-6 border-t border-solid border-gray-200 rounded-b">
+                    <button
+                        class="text-blue-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button" onclick="toggleModal('Review-Lab');clearInputs('reviewLab')">Close</button>
+
+                    <button
+                        class="bg-blue-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2 rounded shadow
+            hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="submit" form='reviewLab'>
+                        Confirm Labs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script type="text/javascript">
         function toggleModal(modalID) {
             document.getElementById(modalID).classList.toggle("hidden");
@@ -249,6 +359,41 @@
             document.getElementById(modalID).classList.toggle("flex");
             document.getElementById("backdrop").classList.toggle("flex");
         }
+
+        function sortBy(column) {
+            if (getQueryVariable(`${column}`) == -1) {
+                window.location.replace(`{{ route('Labs') }}?${column}=asc`);
+            } else if (getQueryVariable(`${column}`) == 'asc') {
+                window.location.replace(`{{ route('Labs') }}?${column}=desc`);
+            } else {
+                window.location.replace("{{ route('Labs') }}");
+            }
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return -1; //not found
+        }
+
+        function toggleDropDown(dropDownID) {
+            document.getElementById(dropDownID).classList.toggle("hidden");
+            document.getElementById(dropDownID).classList.toggle("flex");
+        }
+
+        //set values on page load
+        $(document).ready(function() {
+            var count = {{$count}};
+            if(count > 0){
+                toggleModal('Review-Lab');
+            }
+        });
 
         function clearInputs(formName) {
             document.getElementById(formName).reset();

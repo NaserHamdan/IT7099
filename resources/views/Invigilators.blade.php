@@ -1,18 +1,56 @@
 @extends('Layouts.app')
 @section('title', 'Invigilators')
 @section('content')
+@php
+$url = $_SERVER['REQUEST_URI'];
+if (isset(parse_url($url)['query'])) {
+    $query = parse_url($url)['query'];
+    $sort = explode('&', $query)[0];
+    $column = explode('=', $sort)[0];
+    $order = explode('=', $sort)[1];
+    if (isset($_GET[$column])) {
+        if ($_GET[$column] == 'asc') {
+            $tutors = $tutors->sortby($column);
+        } elseif ($_GET[$column] == 'desc') {
+            $tutors = $tutors->sortByDesc($column);
+        }
+    }
+}
+@endphp
     {{-- backdrop for modals --}}
     <div class="hidden opacity-25 fixed inset-0 z-40 bg-black" id="backdrop"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-5 flex-row">
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+    <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3 flex-row">
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Add-Tutor')">Add</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Edit-Tutor')">Edit</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Delete-Tutor')">Delete</button>
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                <div class="dropdown relative">
+                    <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
+                        class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                        type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg></button>
+                    <div id="sortByDropDown"
+                        class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                        <ul
+                            class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
+                            <li>
+                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                    href="#" onclick="sortBy('tutor_name')">Tutor Name</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                    href="#" onclick="sortBy('position')">Position</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="promptGetTutors()">Get Tutors</button>
             <form id="gatTutors" action="{{ route('LoadTutors') }}" method="GET" class="d-none">
                 @csrf
@@ -161,8 +199,8 @@
                         @csrf
                         <label class="block mt-4 ">
                             <span class="text-gray-700">Tutor</span>
-                            <select id="tutor_id" onchange="setValues('{{ route('fetchTutorData') }}',this.value)" name="tutor_id"
-                                class="form-select mt-1 block w-full">
+                            <select id="tutor_id" onchange="setValues('{{ route('fetchTutorData') }}',this.value)"
+                                name="tutor_id" class="form-select mt-1 block w-full">
                                 @foreach ($tutors as $tutor)
                                     <option value="{{ $tutor->tutor_id }}">{{ $tutor->tutor_name }}</option>
                                 @endforeach
@@ -170,8 +208,8 @@
                         </label>
                         <label class="block">
                             <span class="text-gray-700">Tutor Name</span>
-                            <input id="tutor_name" name="tutor_name" class="form-input mt-1 block w-full" placeholder="Naser Hamdan"
-                                required />
+                            <input id="tutor_name" name="tutor_name" class="form-input mt-1 block w-full"
+                                placeholder="Naser Hamdan" required />
                         </label>
 
                         <label class="block mt-4">
@@ -247,6 +285,67 @@
         </div>
     </div>
 
+    {{-- Review Invigilator Modal --}}
+    <div class=" hidden overflow-x-hidden overflow-y-auto mt-10 fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
+        id="Review-Tutor">
+        <div class="relative w-auto my-auto mx-auto max-w-none">
+            <div
+                class=" border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {{-- modal header --}}
+                <div class="flex items-start p-5 border-b border-solid border-gray-200 rounded-t">
+                    <h3 class="text-3xl font-semibold">Review Labs</h3>
+                </div>
+                {{-- modal body --}}
+                <div class="flex flex-col relative p-6  justify-between text-left ">
+                    <form name='reviewTutor' id='reviewTutor' action="{{ route('updateTutors') }}" method="post">
+                        @csrf
+                        @php
+                            $index = 1;
+                        @endphp
+                        @foreach ($tutors as $tutor)
+                            @if ($tutor->reviewed == 0)
+                                <h6 class="font-semibold">Tutor {{ $index }}</h6>
+                                <input type="hidden" name="tutor_id{{$index}}" value="{{$tutor->tutor_id}}"/>
+                                <label class="block">
+                                    <span class="text-gray-700">Tutor Name</span>
+                                    <input name="tutor_name{{ $index }}" class="form-input mt-1 block w-full"
+                                        value="{{ $tutor->tutor_name }}" placeholder="Naser Hamdan" required />
+                                </label>
+
+                                <label class="block mt-4">
+                                    <span class="text-gray-700">Position</span>
+                                    <select name="position{{$index}}" class="form-select mt-1 block w-full">
+                                        {{-- <option>Select Marking Diffucality</option> --}}
+                                        <option value="Tutor" @if ($tutor->position == 'Tutor'){{ 'selected' }}@endif>Tutor</option>
+                                        <option value="Programme Manager"@if ($tutor->position == 'Programme Manager'){{ 'selected' }}@endif>Programme Manager</option>
+                                        <option value="undefined"@if ($tutor->position == 'undefined'){{ 'selected' }}@endif>Undefined</option>
+                                    </select>
+                                </label>
+                                <hr />
+                                @php
+                                    $index++;
+                                @endphp
+                            @endif
+                        @endforeach
+                        <input type='hidden' name="count" value="{{ $index - 1 }}" />
+                    </form>
+                </div>
+                {{-- modal footer --}}
+                <div class="flex items-center justify-end p-6 border-t border-solid border-gray-200 rounded-b">
+                    <button
+                        class="text-blue-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button" onclick="toggleModal('Review-Tutor');clearInputs('reviewTutor')">Close</button>
+
+                    <button
+                        class="bg-blue-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2 rounded shadow
+    hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="submit" form='reviewTutor'>
+                        Confirm Tutors
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/javascript">
         function toggleModal(modalID) {
@@ -255,6 +354,41 @@
             document.getElementById(modalID).classList.toggle("flex");
             document.getElementById("backdrop").classList.toggle("flex");
         }
+
+        function sortBy(column) {
+            if (getQueryVariable(`${column}`) == -1) {
+                window.location.replace(`{{ route('Invigilators') }}?${column}=asc`);
+            } else if (getQueryVariable(`${column}`) == 'asc') {
+                window.location.replace(`{{ route('Invigilators') }}?${column}=desc`);
+            } else {
+                window.location.replace("{{ route('Invigilators') }}");
+            }
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return -1; //not found
+        }
+
+        function toggleDropDown(dropDownID) {
+            document.getElementById(dropDownID).classList.toggle("hidden");
+            document.getElementById(dropDownID).classList.toggle("flex");
+        }
+
+        $(document).ready(function() {
+            var count = {{ $count }};
+            if (count > 0) {
+                toggleModal('Review-Tutor');
+            }
+        });
+
 
         function clearInputs(formName) {
             document.getElementById(formName).reset();

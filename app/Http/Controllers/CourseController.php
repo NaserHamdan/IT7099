@@ -13,7 +13,7 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 
 class CourseController extends Controller
 {
-    //
+
     public function Courses()
     {
         //$courses = Course::all();
@@ -21,8 +21,14 @@ class CourseController extends Controller
         $years = Year::all();
         $majors = Major::all();
         $tutors = Tutor::all();
+        $count = 0;
+        foreach($courses as $course){
+            if($course->reviewed == 0){
+                $count++;
+            }
+        }
         // return $courses[0]->tutors[0]->tutor_name;
-        return view('Courses', ['courses' => $courses,'years'=>$years,'majors'=>$majors,'tutors'=>$tutors]);
+        return view('Courses', ['courses' => $courses,'years'=>$years,'majors'=>$majors,'tutors'=>$tutors,'count'=>$count]);
     }
 
     public function EditCourses()
@@ -60,6 +66,24 @@ class CourseController extends Controller
             }
         }
         LinkingController::linkCoursesTutors($request);
+        return redirect('/Courses');
+    }
+
+    public function updateCourses(Request $request){
+        $data = $request->all();
+        for($i=1;$i<=$data['count'];$i++){
+            Course::where(['course_id'=>$data['course_id'.$i]])->update([
+                'course_code' => $data['course_code'.$i],
+                'course_title' => $data['course_title'.$i],
+                'number_of_students' => $data['number_of_students'.$i],
+                'marking_diffucality' => $data['marking_diffucality'.$i],
+                'course_coordinator' => $data['course_coordinator'.$i],
+                'have_exam' => $data['have_exam'.$i],
+                'year_id' => $data['year_id'.$i],
+                'major_id' => $data['major_id'.$i],
+                'reviewed' => 1,
+            ]);
+        }
         return redirect('/Courses');
     }
 
