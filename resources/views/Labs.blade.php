@@ -1,61 +1,68 @@
 @extends('Layouts.app')
 @section('title', 'Labs')
 @section('content')
-@php
-$url = $_SERVER['REQUEST_URI'];
-if (isset(parse_url($url)['query'])) {
-    $query = parse_url($url)['query'];
-    $sort = explode('&', $query)[0];
-    $column = explode('=', $sort)[0];
-    $order = explode('=', $sort)[1];
-    if (isset($_GET[$column])) {
-        if ($_GET[$column] == 'asc') {
-            $labs = $labs->sortby($column);
-        } elseif ($_GET[$column] == 'desc') {
-            $labs = $labs->sortByDesc($column);
+    @php
+    $url = $_SERVER['REQUEST_URI'];
+    if (isset(parse_url($url)['query'])) {
+        $query = parse_url($url)['query'];
+        $sort = explode('&', $query)[0];
+        $column = explode('=', $sort)[0];
+        $order = explode('=', $sort)[1];
+        if (isset($_GET[$column])) {
+            if ($_GET[$column] == 'asc') {
+                $labs = $labs->sortby($column);
+            } elseif ($_GET[$column] == 'desc') {
+                $labs = $labs->sortByDesc($column);
+            }
         }
     }
-}
 
-@endphp
+    @endphp
     {{-- backdrop for modals --}}
     <div class="hidden opacity-25 fixed inset-0 z-40 bg-black" id="backdrop"></div>
 
     <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-3 flex-row">
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Add-Lab')">Add</button>
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Edit-Lab')">Edit</button>
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Delete-Lab')">Delete</button>
-                <div class="dropdown relative">
-                    <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
-                        class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                        type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg></button>
-                    <div id="sortByDropDown"
-                        class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
-                        <ul
-                            class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
-                            <li>
-                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
-                                    href="#" onclick="sortBy('room')">Room</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
-                                    href="#" onclick="sortBy('building')">Building</a>
-                            </li>
-                        </ul>
-                    </div>
+            @if (Auth::user()->admin == 1)
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Add-Lab')">Add</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Edit-Lab')">Edit</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Delete-Lab')">Delete</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="promptGetLabs()">Get Labs</button>
+                <form id="gatLabs" action="{{ route('LoadLabs') }}" method="GET" class="d-none">
+                    @csrf
+                </form>
+            @endif
+            <div class="dropdown relative">
+                <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg></button>
+                <div id="sortByDropDown"
+                    class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                    <ul
+                        class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
+                        <li>
+                            <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                href="#" onclick="sortBy('room')">Room</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                href="#" onclick="sortBy('building')">Building</a>
+                        </li>
+                    </ul>
                 </div>
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="promptGetLabs()">Get Labs</button>
-            <form id="gatLabs" action="{{ route('LoadLabs') }}" method="GET" class="d-none">
-                @csrf
-            </form>
+            </div>
+
         </div>
 
         <div class="flex flex-col mt-8">
@@ -293,37 +300,39 @@ if (isset(parse_url($url)['query'])) {
                 </div>
                 {{-- modal body --}}
                 <div class="flex flex-col relative p-6  justify-between text-left ">
-                    <form name='reviewLab' id='reviewLab' action="{{route('updateLabs')}}" method="post">
+                    <form name='reviewLab' id='reviewLab' action="{{ route('updateLabs') }}" method="post">
                         @csrf
                         @php
                             $index = 1;
                         @endphp
                         @foreach ($labs as $lab)
                             @if ($lab->reviewed == 0)
-                                <h6 class="font-semibold">Lab {{$index}}</h6>
-                                <input type="hidden" name="lab_id{{$index}}" value="{{$lab->lab_id}}" />
+                                <h6 class="font-semibold">Lab {{ $index }}</h6>
+                                <input type="hidden" name="lab_id{{ $index }}" value="{{ $lab->lab_id }}" />
                                 <label class="block">
                                     <span class="text-gray-700">Lab room</span>
-                                    <input name="room{{$index}}" class="form-input mt-1 block w-full" placeholder="36.124"
-                                        value="{{ $lab->room }}" required />
+                                    <input name="room{{ $index }}" class="form-input mt-1 block w-full"
+                                        placeholder="36.124" value="{{ $lab->room }}" required />
                                 </label>
 
                                 <label class="block">
                                     <span class="text-gray-700">Building</span>
-                                    <input name="building{{$index}}" class="form-input mt-1 block w-full" placeholder="BLDG36"
-                                        value="{{ $lab->building }}" required />
+                                    <input name="building{{ $index }}" class="form-input mt-1 block w-full"
+                                        placeholder="BLDG36" value="{{ $lab->building }}" required />
                                 </label>
 
                                 <label class="block">
                                     <span class="text-gray-700">Max Capacity</span>
-                                    <input name="max_capacity{{$index}}" type="number" class="form-input mt-1 block w-full"
-                                        value="{{ $lab->max_capacity }}" placeholder="20" required />
+                                    <input name="max_capacity{{ $index }}" type="number"
+                                        class="form-input mt-1 block w-full" value="{{ $lab->max_capacity }}"
+                                        placeholder="20" required />
                                 </label>
 
                                 <label class="block">
                                     <span class="text-gray-700">Available capacity</span>
-                                    <input name="available_capacity{{$index}}" type="number" class="form-input mt-1 block w-full"
-                                        value="{{ $lab->available_capacity }}" placeholder="15" required />
+                                    <input name="available_capacity{{ $index }}" type="number"
+                                        class="form-input mt-1 block w-full" value="{{ $lab->available_capacity }}"
+                                        placeholder="15" required />
                                 </label>
                                 <hr />
                                 @php
@@ -331,7 +340,7 @@ if (isset(parse_url($url)['query'])) {
                                 @endphp
                             @endif
                         @endforeach
-                        <input type='hidden' name="count" value="{{$index-1}}"/>
+                        <input type='hidden' name="count" value="{{ $index - 1 }}" />
                     </form>
                 </div>
                 {{-- modal footer --}}
@@ -389,8 +398,8 @@ if (isset(parse_url($url)['query'])) {
 
         //set values on page load
         $(document).ready(function() {
-            var count = {{$count}};
-            if(count > 0){
+            var count = {{ $count }};
+            if (count > 0) {
                 toggleModal('Review-Lab');
             }
         });

@@ -32,6 +32,7 @@ class User extends Authenticatable implements LdapAuthenticatable
      * @var array
      */
     protected $hidden = [
+        'admin',
         'password',
         'remember_token',
     ];

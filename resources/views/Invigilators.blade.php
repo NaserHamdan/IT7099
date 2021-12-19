@@ -1,60 +1,67 @@
 @extends('Layouts.app')
 @section('title', 'Invigilators')
 @section('content')
-@php
-$url = $_SERVER['REQUEST_URI'];
-if (isset(parse_url($url)['query'])) {
-    $query = parse_url($url)['query'];
-    $sort = explode('&', $query)[0];
-    $column = explode('=', $sort)[0];
-    $order = explode('=', $sort)[1];
-    if (isset($_GET[$column])) {
-        if ($_GET[$column] == 'asc') {
-            $tutors = $tutors->sortby($column);
-        } elseif ($_GET[$column] == 'desc') {
-            $tutors = $tutors->sortByDesc($column);
+    @php
+    $url = $_SERVER['REQUEST_URI'];
+    if (isset(parse_url($url)['query'])) {
+        $query = parse_url($url)['query'];
+        $sort = explode('&', $query)[0];
+        $column = explode('=', $sort)[0];
+        $order = explode('=', $sort)[1];
+        if (isset($_GET[$column])) {
+            if ($_GET[$column] == 'asc') {
+                $tutors = $tutors->sortby($column);
+            } elseif ($_GET[$column] == 'desc') {
+                $tutors = $tutors->sortByDesc($column);
+            }
         }
     }
-}
-@endphp
+    @endphp
     {{-- backdrop for modals --}}
     <div class="hidden opacity-25 fixed inset-0 z-40 bg-black" id="backdrop"></div>
 
     <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-3 flex-row">
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Add-Tutor')">Add</button>
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Edit-Tutor')">Edit</button>
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Delete-Tutor')">Delete</button>
-                <div class="dropdown relative">
-                    <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
-                        class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                        type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg></button>
-                    <div id="sortByDropDown"
-                        class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
-                        <ul
-                            class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
-                            <li>
-                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
-                                    href="#" onclick="sortBy('tutor_name')">Tutor Name</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
-                                    href="#" onclick="sortBy('position')">Position</a>
-                            </li>
-                        </ul>
-                    </div>
+            @if (Auth::user()->admin == 1)
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Add-Tutor')">Add</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Edit-Tutor')">Edit</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Delete-Tutor')">Delete</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="promptGetTutors()">Get Tutors</button>
+                <form id="gatTutors" action="{{ route('LoadTutors') }}" method="GET" class="d-none">
+                    @csrf
+                </form>
+            @endif
+            <div class="dropdown relative">
+                <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    type="button">Sort By <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg></button>
+                <div id="sortByDropDown"
+                    class="hidden z-10 w-44 text-base list-none fixed bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                    <ul
+                        class=" min-w-max absolute bg-gray-500 text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 m-0 bg-clip-padding border-none">
+                        <li>
+                            <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                href="#" onclick="sortBy('tutor_name')">Tutor Name</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-white hover:bg-gray-100"
+                                href="#" onclick="sortBy('position')">Position</a>
+                        </li>
+                    </ul>
                 </div>
-            <button class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="promptGetTutors()">Get Tutors</button>
-            <form id="gatTutors" action="{{ route('LoadTutors') }}" method="GET" class="d-none">
-                @csrf
-            </form>
+            </div>
+
         </div>
 
         <div class="flex flex-col mt-8">
@@ -305,7 +312,7 @@ if (isset(parse_url($url)['query'])) {
                         @foreach ($tutors as $tutor)
                             @if ($tutor->reviewed == 0)
                                 <h6 class="font-semibold">Tutor {{ $index }}</h6>
-                                <input type="hidden" name="tutor_id{{$index}}" value="{{$tutor->tutor_id}}"/>
+                                <input type="hidden" name="tutor_id{{ $index }}" value="{{ $tutor->tutor_id }}" />
                                 <label class="block">
                                     <span class="text-gray-700">Tutor Name</span>
                                     <input name="tutor_name{{ $index }}" class="form-input mt-1 block w-full"
@@ -314,11 +321,12 @@ if (isset(parse_url($url)['query'])) {
 
                                 <label class="block mt-4">
                                     <span class="text-gray-700">Position</span>
-                                    <select name="position{{$index}}" class="form-select mt-1 block w-full">
+                                    <select name="position{{ $index }}" class="form-select mt-1 block w-full">
                                         {{-- <option>Select Marking Diffucality</option> --}}
                                         <option value="Tutor" @if ($tutor->position == 'Tutor'){{ 'selected' }}@endif>Tutor</option>
-                                        <option value="Programme Manager"@if ($tutor->position == 'Programme Manager'){{ 'selected' }}@endif>Programme Manager</option>
-                                        <option value="undefined"@if ($tutor->position == 'undefined'){{ 'selected' }}@endif>Undefined</option>
+                                        <option value="Programme Manager" @if ($tutor->position == 'Programme Manager'){{ 'selected' }}@endif>Programme Manager
+                                        </option>
+                                        <option value="undefined" @if ($tutor->position == 'undefined'){{ 'selected' }}@endif>Undefined</option>
                                     </select>
                                 </label>
                                 <hr />

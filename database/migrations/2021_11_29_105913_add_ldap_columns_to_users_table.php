@@ -14,6 +14,7 @@ class AddLdapColumnsToUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('guid')->unique()->nullable();
             $table->string('domain')->nullable();
+            $table->boolean('admin')->default(false);
         });
     }
 

@@ -23,15 +23,23 @@
     {{-- button options --}}
     <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-3 flex-row">
-            <button
-                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Add-Exam')">Add</button>
-            <button
-                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Edit-Exam')">Edit</button>
-            <button
-                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="toggleModal('Delete-Exam')">Delete</button>
+            @if (Auth::user()->admin == 1)
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Add-Exam')">Add</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Edit-Exam')">Edit</button>
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Delete-Exam')">Delete</button>
+
+                <label
+                    class="text-white m-0 bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    for="start_date">Start Date</label>
+                <input id="start_date" value="" name="start_date" min="{{ date('Y-m-d') }}" type="date"
+                    class="form-input font-bold py-2 px-4 rounded" required />
+            @endif
             <div class="dropdown relative">
                 <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
                     class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
@@ -57,11 +65,7 @@
             <button
                 class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="downloadPdf()">Print/Export</button>
-            <label
-                class="text-white m-0 bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                for="start_date">Start Date</label>
-            <input id="start_date" value="" name="start_date" min="{{ date('Y-m-d') }}" type="date"
-                class="form-input font-bold py-2 px-4 rounded" required />
+
         </div>
         {{-- courses table --}}
         <div id="table" class="flex flex-col mt-8 print:landscape">
@@ -128,7 +132,7 @@
                                     <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
                                         <div class="text-sm leading-5 text-gray-500">
                                             <p class="p-0 m-0" id="PL-{{ $exam->exam_id }}"
-                                                onclick="showCheckboxes('L-{{ $index }}')">
+                                                @if (Auth::user()->admin == 1) onclick="showCheckboxes('L-{{ $index }}')" @endif>
                                                 @php
                                                     $length = count($exam->labs);
                                                 @endphp
@@ -168,7 +172,7 @@
                 <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
                     <div class="text-sm leading-5 text-gray-500">
                         <p class="p-0 m-0" id="PI-{{ $exam->exam_id }}"
-                            onclick="showCheckboxes('I-{{ $index }}')">
+                            @if (Auth::user()->admin == 1) onclick="showCheckboxes('I-{{ $index }}')"@endif>
                             @php
                                 $length = count($exam->tutors);
                             @endphp
@@ -621,7 +625,9 @@
         var end_date_default = "{{ $setting->end_date ?? ' ' }}";
         //set the start date as the default passed from php
         function setDate() {
-            document.getElementById('start_date').value = start_date_default;
+            if (document.getElementById('start_date') != null) {
+                document.getElementById('start_date').value = start_date_default;
+            }
         }
         //set values on page load
         $(document).ready(function() {
@@ -631,6 +637,7 @@
         });
         //if the date is changed and it's a sunday, update the start date and end date on the settings
         document.getElementById("start_date").onchange = function() {
+            fromInput = 'M';
             var date = new Date(this.value);
             var end = new Date();
             end.setDate(date.getDate() + 4);
@@ -644,6 +651,7 @@
                 const data = {
                     start_date: start_date_const,
                     end_date: end_Date_const,
+                    timetable_type: fromInput,
                 };
                 fetch("{{ route('updateSettings') }}", {
                         method: 'post', // or 'PUT'

@@ -2,17 +2,19 @@
 @section('title', 'Courses')
 @section('content')
     @php
-    $url = $_SERVER['REQUEST_URI'];
-    if (isset(parse_url($url)['query'])) {
-        $query = parse_url($url)['query'];
-        $sort = explode('&', $query)[0];
-        $column = explode('=', $sort)[0];
-        $order = explode('=', $sort)[1];
-        if (isset($_GET[$column])) {
-            if ($_GET[$column] == 'asc') {
-                $courses = $courses->sortby($column);
-            } elseif ($_GET[$column] == 'desc') {
-                $courses = $courses->sortByDesc($column);
+    if (count($courses) > 0) {
+        $url = $_SERVER['REQUEST_URI'];
+        if (isset(parse_url($url)['query'])) {
+            $query = parse_url($url)['query'];
+            $sort = explode('&', $query)[0];
+            $column = explode('=', $sort)[0];
+            $order = explode('=', $sort)[1];
+            if (isset($_GET[$column])) {
+                if ($_GET[$column] == 'asc') {
+                    $courses = $courses->sortby($column);
+                } elseif ($_GET[$column] == 'desc') {
+                    $courses = $courses->sortByDesc($column);
+                }
             }
         }
     }
@@ -23,6 +25,7 @@
     {{-- button options --}}
     <div class="max-w-fit mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-3 flex-row">
+            @if(Auth::user()->admin == 1)
             <button
                 class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Add-Courses')">Add</button>
@@ -32,6 +35,13 @@
             <button
                 class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                 onclick="toggleModal('Delete-Course')">Delete</button>
+            <button
+                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                onclick="promptGetCourses()">Get Courses</button>
+            <form id="gatCourses" action="{{ route('LoadCourses') }}" method="GET" class="d-none">
+                @csrf
+            </form>
+            @endif
             <div class="dropdown relative">
                 <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
                     class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
@@ -70,12 +80,6 @@
                     </ul>
                 </div>
             </div>
-            <button
-                class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                onclick="promptGetCourses()">Get Courses</button>
-            <form id="gatCourses" action="{{ route('LoadCourses') }}" method="GET" class="d-none">
-                @csrf
-            </form>
         </div>
         {{-- coursestable --}}
         <div class="flex flex-col mt-8">
@@ -371,13 +375,13 @@
                             </label>
                             <label class="block">
                                 <span class="text-gray-700">Course Code</span>
-                                <input id="course_code" name="course_code" value="{{ $courses[0]->course_code }}"
+                                <input id="course_code" name="course_code" value=""
                                     class="form-input mt-1 block w-full" placeholder="IT6001" required />
                             </label>
 
                             <label class="block">
                                 <span class="text-gray-700">Course Title</span>
-                                <input id="course_title" name="course_title" value="{{ $courses[0]->course_title }}"
+                                <input id="course_title" name="course_title" value=""
                                     class="form-input mt-1 block w-full" placeholder="Computer Systems" required />
                             </label>
 
@@ -385,26 +389,26 @@
                                 <span class="text-gray-700">Number of Students</span>
                                 <input id="number_of_students" name="number_of_students"
                                     class="form-input mt-1 block w-full" type="number"
-                                    value="{{ $courses[0]->number_of_students }}" placeholder="i.e 90" required />
+                                    value="" placeholder="i.e 90" required />
                             </label>
                             <label class="block mt-4">
                                 <span class="text-gray-700">Marking Diffucality</span>
                                 <select id="marking_diffucality" name="marking_diffucality"
-                                    value="{{ $courses[0]->marking_diffucality }}"
+                                    value=""
                                     class="form-select mt-1 block w-full">
                                     {{-- <option>Select Marking Diffucality</option> --}}
-                                    <option value="Low" @if ($courses[0]->marking_diffucality == 'Low'){{ 'selected' }}@endif>Low</option>
-                                    <option value="Medium" @if ($courses[0]->marking_diffucality == 'Medium'){{ 'selected' }}@endif>Medium</option>
-                                    <option value="High" @if ($courses[0]->marking_diffucality == 'High'){{ 'selected' }}@endif>High</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" >Medium</option>
+                                    <option value="High" >High</option>
                                 </select>
                             </label>
                             <label class="block mt-4">
                                 <span class="text-gray-700">Exams</span>
                                 <select id="have_exam" name="have_exam" class="form-select mt-1 block w-full">
-                                    <option value="N" @if ($courses[0]->have_exam == 'N'){{ 'selected' }}@endif>No Exams</option>
-                                    <option value="M" @if ($courses[0]->have_exam == 'M'){{ 'selected' }}@endif>Midterm Only</option>
-                                    <option value="F" @if ($courses[0]->have_exam == 'F'){{ 'selected' }}@endif>Final Only</option>
-                                    <option value="B" @if ($courses[0]->have_exam == 'B'){{ 'selected' }}@endif>Both Exams</option>
+                                    <option value="N" >No Exams</option>
+                                    <option value="M">Midterm Only</option>
+                                    <option value="F" >Final Only</option>
+                                    <option value="B">Both Exams</option>
                                 </select>
                             </label>
                             <label class="block mt-4">
@@ -413,7 +417,7 @@
                                     class="form-select mt-1 block w-full">
                                     <option value="NA">NA</option>
                                     @foreach ($tutors as $tutor)
-                                        <option value="{{ $tutor->tutor_name }}" @if ($courses[0]->course_coordinator == $tutor->tutor_name){{ 'selected' }}@endif>
+                                        <option value="{{ $tutor->tutor_name }}">
                                             {{ $tutor->tutor_name }}</option>
                                     @endforeach
                                 </select>
@@ -424,7 +428,7 @@
                             <span class="text-gray-700">Number of Tutors <span class="text-gray-500">.6
                                     max</span></span>
                             <input id="numberOfTutorsE" name="numberOfTutors" type="number" id="numberOfTutorsE"
-                                onchange="addFieldsE()" min=1 max=6 value="{{ count($courses[0]->tutors) }}"
+                                onchange="addFieldsE()" min=1 max=6 value=""
                                 class="form-input mt-1 block w-full" required />
                         </label>
 
@@ -794,7 +798,7 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
 
 
         $(document).ready(function() {
-            setValues("{{ route('fetchCourseData') }}", '{{ $courses[0]->course_id }}');
+            setValues("{{ route('fetchCourseData') }}", '{{ $courses[0]->course_id??1 }}');
             var count = {{ $count }};
             if (count > 0) {
                 @for ($i = 1; $i <= $count; $i++)

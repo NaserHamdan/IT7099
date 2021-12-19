@@ -18,6 +18,7 @@ class SettingController extends Controller
         [
             'start_date'=> $date['start_date'],
             'end_date'=> $date['end_date'],
+            'timetable_type'=> $date['timetable_type'],
         ]);
         return response(['successful'=>true,'start_date'=>$date['start_date'],'end_date'=>$date['end_date']]);
     }
