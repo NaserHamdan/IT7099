@@ -1,5 +1,5 @@
 @extends('Layouts.app')
-@section('title',"hambrga")
+@section('title',"index")
 @section("content")
-
+<h1>Example Page</h1>
 @endsection

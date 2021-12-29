@@ -13,11 +13,6 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
-    //
-    // public function addCourse(Request $request){
-    //     dd($request->all());
-    //     return view('testing',['request'=>$request]);
-    // }
 
     public function addCourse(Request $request)
     {

@@ -44,7 +44,6 @@ class CourseController extends Controller
         $courses = Schedule::select('sec_course', 'sec_long_title')->distinct()->where('SEC_TERM_CODE', $term)->where('SEC_COLLEGE', 'IT')->get();
         foreach ($courses as $course) {
             if (!str_contains($course['sec_course'], 'WM')) {
-                // $sum = Schedule::select(DB::raw("SUM(SEC_ENROLLED_STUDENTS) as sum"))->distinct('sec_crn')->where('SEC_TERM_CODE', $term)->where('SEC_COURSE', $course['sec_course'])->groupBy('sec_crn')->get();
                 $numbers = Schedule::select('sec_crn', "sec_enrolled_students")->distinct()->where('SEC_TERM_CODE', $term)->where('SEC_COURSE', $course['sec_course'])->get();
                 $sum = 0;
                 foreach ($numbers as $number) {

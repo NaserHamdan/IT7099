@@ -24,6 +24,6 @@ class timeslotsSeeder extends Seeder
             'database' => env('DB_DATABASE')
         ];
         DB::unprepared(file_get_contents($sql));
-        // exec("mysql --user={$db['username']} --password={$db['password']} --host={$db['host']} --database {$db['database']} < $sql");
+
     }
 }

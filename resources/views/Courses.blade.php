@@ -761,6 +761,7 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
 
 
     <script type="text/javascript">
+
         function sortBy(column) {
             if (getQueryVariable(`${column}`) == -1) {
                 window.location.replace(`{{ route('Courses') }}?${column}=asc`);
