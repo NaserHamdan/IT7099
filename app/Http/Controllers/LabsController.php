@@ -50,7 +50,7 @@ class LabsController extends Controller
             } else {
             }
         }
-        return redirect('/Labs');
+        return redirect('/labs');
     }
 
     public function getAllLabs(Request $request){
@@ -69,6 +69,6 @@ class LabsController extends Controller
                 'reviewed' => 1,
             ]);
         }
-        return redirect('/Labs');
+        return redirect('/labs');
     }
 }

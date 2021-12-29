@@ -38,7 +38,7 @@ class InvigilatorsController extends Controller
             } else {
             }
         }
-        return redirect('/Invigilators');
+        return redirect('/invigilators');
     }
 
     public function updateTutors(Request $request){
@@ -50,6 +50,6 @@ class InvigilatorsController extends Controller
                 'reviewed' => 1,
             ]);
         }
-        return redirect('/Invigilators');
+        return redirect('/invigilators');
     }
 }

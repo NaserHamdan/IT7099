@@ -36,7 +36,7 @@ class ApiController extends Controller
                 course_tutor::firstOrCreate(['tutor_id' => $tutor_id, 'course_id' => $course->course_id]);
             }
         }
-        return redirect('/Courses');
+        return redirect('/courses');
     }
 
     public function deleteCourse(Request $request)
@@ -46,7 +46,7 @@ class ApiController extends Controller
         $course->courses_tutors()->delete();
         $course->exams()->delete();
         $course->delete();
-        return redirect('/Courses');
+        return redirect('/courses');
     }
 
     public function fetchCourseData(Request $request)
@@ -81,7 +81,7 @@ class ApiController extends Controller
                 course_tutor::firstOrCreate(['tutor_id' => $tutor_id, 'course_id' => $course->course_id]);
             }
         }
-        return redirect('/Courses');
+        return redirect('/courses');
     }
 
     public function addTutor(Request $request)
@@ -96,7 +96,7 @@ class ApiController extends Controller
                 'reviewed' => $data['reviewed']
             ]
         );
-        return redirect('/Invigilators');
+        return redirect('/invigilators');
     }
 
     public function deleteTutor(Request $request)
@@ -104,7 +104,7 @@ class ApiController extends Controller
         $data = $request->all();
         $tutor = Tutor::findOrFail($data['tutor_id']);
         $tutor->delete();
-        return redirect('/Invigilators');
+        return redirect('/invigilators');
     }
 
     public function fetchTutorData(Request $request)
@@ -124,7 +124,7 @@ class ApiController extends Controller
                 'reviewed' => $data['reviewed'],
             ]
         );
-        return redirect('/Invigilators');
+        return redirect('/invigilators');
     }
 
     public function addLab(Request $request)
@@ -141,7 +141,7 @@ class ApiController extends Controller
                 'reviewed' => $data['reviewed'],
             ]
         );
-        return redirect('/Labs');
+        return redirect('/labs');
     }
 
     public function deleteLab(Request $request)
@@ -149,7 +149,7 @@ class ApiController extends Controller
         $data = $request->all();
         $lab = Lab::findOrFail($data['lab_id']);
         $lab->delete();
-        return redirect('/Labs');
+        return redirect('/labs');
     }
 
     public function fetchLabData(Request $request)
@@ -173,7 +173,7 @@ class ApiController extends Controller
                 'reviewed' => $data['reviewed'],
             ]
         );
-        return redirect('/Labs');
+        return redirect('/labs');
     }
 
     public function updateLabs(Request $request)
@@ -216,7 +216,7 @@ class ApiController extends Controller
                 'date' => $data['date'],
             ]
         );
-        return redirect('/Schedule');
+        return redirect('/schedule');
     }
 
     public function deleteExam(Request $request)
@@ -224,7 +224,7 @@ class ApiController extends Controller
         $data = $request->all();
         $exam = Exam::findOrFail($data['exam_id']);
         $exam->delete();
-        return redirect('/Schedule');
+        return redirect('/schedule');
     }
 
 }

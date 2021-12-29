@@ -41,13 +41,13 @@ Auth::routes([
 Route::get('/test', [HomeController::class, 'index'])->name('test');
 Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('auth');
 //tutors routes
-Route::get('/Invigilators', [InvigilatorsController::class, 'invigilators'])->name('Invigilators')->middleware('auth');
+Route::get('/invigilators', [InvigilatorsController::class, 'invigilators'])->name('Invigilators')->middleware('auth');
 //schedule routes
-Route::get('/Schedule', [ScheduleController::class, 'schedule'])->name('Schedule')->middleware('auth');
+Route::get('/schedule', [ScheduleController::class, 'schedule'])->name('schedule')->middleware('auth');
 //labs routes
-Route::get('/Labs', [LabsController::class, 'labs'])->name('Labs')->middleware('auth');
+Route::get('/labs', [LabsController::class, 'labs'])->name('labs')->middleware('auth');
 //courses routes
-Route::get('/Courses', [CourseController::class, 'Courses'])->name('Courses')->middleware('auth');
+Route::get('/courses', [CourseController::class, 'courses'])->name('courses')->middleware('auth');
 Route::get('/EditCourses', [CourseController::class, 'EditCourses'])->name('EditCourses')->middleware('auth');
 //load database routes
 Route::get('/LoadTutors', [InvigilatorsController::class, 'loadtutors'])->name('LoadTutors')->middleware('auth');

@@ -1,4 +1,4 @@
-@extends('Layouts.app')
+@extends('layouts.app')
 @section('title',"index")
 @section("content")
 <h1>Example Page</h1>

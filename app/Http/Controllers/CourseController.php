@@ -28,7 +28,7 @@ class CourseController extends Controller
             }
         }
         // return $courses[0]->tutors[0]->tutor_name;
-        return view('Courses', ['courses' => $courses,'years'=>$years,'majors'=>$majors,'tutors'=>$tutors,'count'=>$count]);
+        return view('courses', ['courses' => $courses,'years'=>$years,'majors'=>$majors,'tutors'=>$tutors,'count'=>$count]);
     }
 
     public function EditCourses()
@@ -65,7 +65,7 @@ class CourseController extends Controller
             }
         }
         LinkingController::linkCoursesTutors($request);
-        return redirect('/Courses');
+        return redirect('/courses');
     }
 
     public function updateCourses(Request $request){
@@ -83,7 +83,7 @@ class CourseController extends Controller
                 'reviewed' => 1,
             ]);
         }
-        return redirect('/Courses');
+        return redirect('/courses');
     }
 
 }
