@@ -97,7 +97,6 @@
                 </form>
             </div>
         </div>
-    @endauth
     <script>
         // Grab HTML Elements
         const btn = document.querySelector("button.mobile-menu-button");
@@ -112,4 +111,5 @@
             close.classList.toggle("hidden");
         });
     </script>
+    @endauth
 </nav>

@@ -33,12 +33,9 @@
                 <button
                     class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
                     onclick="toggleModal('Delete-Exam')">Delete</button>
-
-                <label
-                    class="text-white m-0 bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
-                    for="start_date">Start Date</label>
-                <input id="start_date" value="" name="start_date" min="{{ date('Y-m-d') }}" type="date"
-                    class="form-input font-bold py-2 px-4 rounded" required />
+                <button
+                    class="text-white bg-gray-500 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-m px-4 py-2.5 text-center inline-flex items-center"
+                    onclick="toggleModal('Edit-Setting')">Edit Settings</button>
             @endif
             <div class="dropdown relative">
                 <button id="dropdownButton" onclick="toggleDropDown('sortByDropDown')"
@@ -104,75 +101,76 @@
                                 $index = 0;
                             @endphp
                             @foreach ($exams as $exam)
-                                @php
-                                    $index++;
-                                @endphp
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">{{ $exam->course->year->number }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4whitespace-nowrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">
-                                            {{ $exam->course->major->major_name }}</div>
-                                    </td>
-                                    <td class="px-6 border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">
-                                            {{ $exam->course->course_code . ' - ' . $exam->course->course_title }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">
-                                            {{ date('l d/m/Y', strtotime($exam->date)) }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-normal border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">
-                                            {{ date('H:i', strtotime($exam->timeslot->start_time)) . ' - ' . date('H:i', strtotime($exam->timeslot->end_time)) }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500">
-                                            <p class="p-0 m-0" id="PL-{{ $exam->exam_id }}"
-                                                @if (Auth::user()->admin == 1) onclick="showCheckboxes('L-{{ $index }}')" @endif>
-                                                @php
-                                                    $length = count($exam->labs);
-                                                @endphp
-                                                @if (count($exam->labs) == 0)
-                                                    <span
-                                                        class='border-2 border-yellow-200 rounded-lg p-1 cursor-pointer mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9 '>
-                                                        {{ 'No Labs are assigned for this exam' }}
-                                                    </span>
-                                                @else
-                                                    @foreach ($exam->labs as $i => $lab)
-                                                        <span id="E{{ $exam->exam_id }}L{{ $lab->lab_id }}"
-                                                            class='border-2 rounded-lg p-1 mr-1 leading-9 cursor-pointer'>
-                                                            {{ $lab->room }}
+                                @if ($exam->exam_type == 'B' || $exam->exam_type == $setting->timetable_type)
+                                    @php
+                                        $index++;
+                                    @endphp
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                                            <div class="text-sm leading-5 text-gray-500">{{ $exam->course->year->number }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4whitespace-nowrap border-b border-gray-200">
+                                            <div class="text-sm leading-5 text-gray-500">
+                                                {{ $exam->course->major->major_name }}</div>
+                                        </td>
+                                        <td class="px-6 border-b border-gray-200">
+                                            <div class="text-sm leading-5 text-gray-500">
+                                                {{ $exam->course->course_code . ' - ' . $exam->course->course_title }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 border-b border-gray-200">
+                                            <div class="text-sm leading-5 text-gray-500">
+                                                {{ date('l d/m/Y', strtotime($exam->date)) }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-normal border-b border-gray-200">
+                                            <div class="text-sm leading-5 text-gray-500">
+                                                {{ date('H:i', strtotime($exam->timeslot->start_time)) . ' - ' . date('H:i', strtotime($exam->timeslot->end_time)) }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
+                                            <div class="text-sm leading-5 text-gray-500">
+                                                <p class="p-0 m-0" id="PL-{{ $exam->exam_id }}"
+                                                    @if (Auth::user()->admin == 1) onclick="showCheckboxes('L-{{ $index }}')" @endif>
+                                                    @php
+                                                        $length = count($exam->labs);
+                                                    @endphp
+                                                    @if (count($exam->labs) == 0)
+                                                        <span
+                                                            class='border-2 border-yellow-200 rounded-lg p-1 cursor-pointer mr-1 bg-yellow-100 hover:bg-yellow-200 leading-9 '>
+                                                            {{ 'No Labs are assigned for this exam' }}
                                                         </span>
-                                                    @endforeach
-                                                @endif
-                                            </p>
-                                            <div id="L-{{ $index }}" class=" hidden mt-2">
-                                                <select id="multi" name="labs[]"
-                                                    onclick="updateLabs(this,'{{ route('updateLabs') }}', '{{ $exam->exam_id }}');"
-                                                    class="form-multiselect multi block w-full mt-1 " multiple>
-                                                    @foreach ($labs as $lab)
-                                                        <option class="" value="{{ $lab->lab_id }}"
-                                                            @foreach ($exam->labs as $elab)
-                                                            @if ($elab->lab_id == $lab->lab_id)
-                                                                {{ 'selected' }}
-                                                            @endif
-                                                    @endforeach
-                                                    >
-                                                    {{ $lab->room }}
-                                                    </option>
-                            @endforeach
-                            </select>
+                                                    @else
+                                                        @foreach ($exam->labs as $i => $lab)
+                                                            <span id="E{{ $exam->exam_id }}L{{ $lab->lab_id }}"
+                                                                class='border-2 rounded-lg p-1 mr-1 leading-9 cursor-pointer'>
+                                                                {{ $lab->room }}
+                                                            </span>
+                                                        @endforeach
+                                                    @endif
+                                                </p>
+                                                <div id="L-{{ $index }}" class=" hidden mt-2">
+                                                    <select id="multi" name="labs[]"
+                                                        onclick="updateLabs(this,'{{ route('updateLabs') }}', '{{ $exam->exam_id }}');"
+                                                        class="form-multiselect multi block w-full mt-1 " multiple>
+                                                        @foreach ($labs as $lab)
+                                                            <option class="" value="{{ $lab->lab_id }}"
+                                                                @foreach ($exam->labs as $elab)
+                                                                @if ($elab->lab_id == $lab->lab_id)
+                                                                    {{ 'selected' }}
+                                                                @endif
+                                                        @endforeach
+                                                        >
+                                                        {{ $lab->room }}
+                                                        </option>
+                                @endforeach
+                                </select>
                 </div>
                 </td>
                 {{-- comment --}}
                 <td class="px-6 py-4 h-auto w-1/4 whitespace-normal border-b border-gray-200">
                     <div class="text-sm leading-5 text-gray-500">
-                        <p class="p-0 m-0" id="PI-{{ $exam->exam_id }}"
-                            @if (Auth::user()->admin == 1) onclick="showCheckboxes('I-{{ $index }}')"@endif>
+                        <p class="p-0 m-0" id="PI-{{ $exam->exam_id }}" @if (Auth::user()->admin == 1) onclick="showCheckboxes('I-{{ $index }}')"@endif>
                             @php
                                 $length = count($exam->tutors);
                             @endphp
@@ -208,6 +206,7 @@
                         </div>
                 </td>
                 </tr>
+                @endif
                 @endforeach
                 </tbody>
                 </table>
@@ -234,15 +233,17 @@
                             <span class="text-gray-700">Course Code</span>
                             <select name="course_id" class="form-select mt-1 block w-full">
                                 @foreach ($courses as $course)
-                                    <option value="{{ $course->course_id }}">
-                                        {{ $course->course_code . ' - ' . $course->course_title }}</option>
+                                    @if ($course->have_exam == 'B' || $course->have_exam == $setting->timetable_type)
+                                        <option value="{{ $course->course_id }}">
+                                            {{ $course->course_code . ' - ' . $course->course_title }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </label>
                         <label class="block">
                             <span class="text-gray-700">Exam Date</span>
-                            <input name="date" type="date" min="{{ date('Y-m-d H:i:s') }}"
-                                class="form-input mt-1 block w-full" placeholder="" required />
+                            <input id="addDate" name="date" type="date" class="form-input mt-1 block w-full" placeholder=""
+                                required />
                         </label>
                         <label class="block mt-4">
                             <span class="text-gray-700">Time slot</span>
@@ -253,6 +254,7 @@
                                 @endforeach
                             </select>
                         </label>
+                        <input type="hidden" name="exam_type" id="exam_type" value="" />
                     </form>
                 </div>
                 {{-- modal footer --}}
@@ -280,35 +282,39 @@
                 class=" border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {{-- modal header --}}
                 <div class="flex items-start p-5 border-b border-solid border-gray-200 rounded-t">
-                    <h3 class="text-3xl font-semibold">Edit a Exam</h3>
+                    <h3 class="text-3xl font-semibold">Edit an Exam</h3>
                 </div>
                 {{-- modal body --}}
                 <div class="flex flex-row relative p-6  justify-between text-left ">
-                    <form name='editExam' id='editExam' action="" method="post">
+                    <form name='editExam' id='editExam' action="{{ route('editExam') }}" method="post">
                         @csrf
                         <label class="block mt-4">
                             <span class="text-gray-700">Select Exam</span>
-                            <select name="exam_id" onchange="setValues('{{ route('fetchCourseData') }}',this.value)"
+                            <select name="exam_id" onchange="setValues('{{ route('fetchExamData') }}',this.value)"
                                 class="form-select mt-1 block w-full">
                                 @foreach ($exams as $exam)
-                                    <option value="{{ $exam->exam_id }}">
-                                        {{ $exam->course->course_code . ' - ' . $exam->course->course_title }}</option>
+                                    @if ($exam->exam_type == $setting->timetable_type)
+                                        <option value="{{ $exam->exam_id }}">
+                                            {{ $exam->course->course_code . ' - ' . $exam->course->course_title }}
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
                         </label>
                         <label class="block mt-4">
                             <span class="text-gray-700">Course</span>
-                            <select name="course_id" onchange="setValues('{{ route('fetchCourseData') }}',this.value)"
-                                class="form-select mt-1 block w-full">
+                            <select id="edit_course_id" name="course_id" class="form-select mt-1 block w-full">
                                 @foreach ($courses as $course)
-                                    <option value="{{ $course->course_id }}">
-                                        {{ $course->course_code . ' - ' . $course->course_title }}</option>
+                                    @if ($course->have_exam == "B" || $course->have_exam == $setting->timetable_type)
+                                        <option value="{{ $course->course_id }}">
+                                            {{ $course->course_code . ' - ' . $course->course_title }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </label>
                         <label class="block mt-4">
                             <span class="text-gray-700">Time Slot</span>
-                            <select id="timeslot_id" name="major_id" class="form-select mt-1 block w-full">
+                            <select id="edit_timeslot_id" name="timeslot_id" class="form-select mt-1 block w-full">
                                 {{-- <option>Select Major</option> --}}
                                 @foreach ($timeslots as $timeslot)
                                     <option value="{{ $timeslot->timeslot_id }}">
@@ -318,9 +324,9 @@
                             </select>
                         </label>
                         <label class="block">
-                            <span class="text-gray-700">Course Code</span>
-                            <input id="course_code" name="course_code" class="form-input mt-1 block w-full"
-                                placeholder="IT6001" required />
+                            <span class="text-gray-700">Exam Date</span>
+                            <input id="edit_Date" name="date" type="date" class="form-input mt-1 block w-full"
+                                placeholder="" required />
                         </label>
                     </form>
                 </div>
@@ -335,6 +341,51 @@
                 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="submit" form="editExam">
                         Edit Exam
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit Setting Modal --}}
+    <div class=" hidden overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
+        id="Edit-Setting">
+        <div class="relative w-auto my-6 mx-auto max-w-none">
+            <div
+                class=" border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {{-- modal header --}}
+                <div class="flex items-start p-5 border-b border-solid border-gray-200 rounded-t">
+                    <h3 class="text-3xl font-semibold">Change Exams Settings</h3>
+                </div>
+                {{-- modal body --}}
+                <div class="flex flex-row relative p-6 justify-between text-left ">
+                    <form name='editSetting' id='editSetting' method="post">
+                        @csrf
+                        <label class="block mt-4">
+                            <span class="text-gray-700">Timetable Type</span>
+                            <select id="timetable_type" name="timetable_type" class="form-select mt-1 block w-full">
+                                <option value="F">Final Exams</option>
+                                <option value="M">Midterm Exams</option>
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="text-gray-700">Exam Date</span>
+                            <input id="start_date" value="" name="start_date" type="date"
+                                class="form-input mt-1 block w-full" required />
+                        </label>
+                    </form>
+                </div>
+                {{-- modal footer --}}
+                <div class="flex items-center justify-end p-6 border-t border-solid border-gray-200 rounded-b">
+                    <button
+                        class="text-blue-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button" onclick="toggleModal('Edit-Setting');">Close</button>
+
+                    <button
+                        class="bg-blue-500 text-white active:bg-purple-600 font-bold uppercase text-xs px-4 py-2
+         rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button" onclick="updateSettings();toggleModal('Edit-Setting');">
+                        Update Settings
                     </button>
                 </div>
             </div>
@@ -382,6 +433,7 @@
             </div>
         </div>
     </div>
+
     <script type="text/javascript">
         // A function for toggleling modals on and off along with the backdrop using modal id
         function toggleModal(modalID) {
@@ -438,6 +490,7 @@
             window.print();
 
             document.body.innerHTML = originalContents;
+            window.location.reload();
         }
         // a function to clear forms on modal close
         function clearInputs(formName) {
@@ -455,7 +508,10 @@
             fetch(`${url}?id=${examId}`)
                 .then(response => response.json())
                 .then(data => {
-                    // document.getElementById('course_code').value = data.course.course_code;
+                    document.getElementById('edit_course_id').value = data.exam.course_id;
+                    document.getElementById('edit_timeslot_id').value = data.exam.timeslot_id;
+                    document.getElementById('edit_Date').setAttribute("value", data.exam.date);
+                    console.log(data.exam.date);
                 });
         }
 
@@ -621,32 +677,54 @@
         });
 
         //get start date and end date of the schedule from php
+        // $start_date = strtotime($setting->start_date ?? ' ');
+        // $start_date = date('Y-m-d', $start_date);
         var start_date_default = "{{ $setting->start_date ?? ' ' }}";
         var end_date_default = "{{ $setting->end_date ?? ' ' }}";
+        var timetable_type_default = "{{ $setting->timetable_type ?? ' ' }}";
         //set the start date as the default passed from php
-        function setDate() {
+        function changeDate() {
             if (document.getElementById('start_date') != null) {
                 document.getElementById('start_date').value = start_date_default;
             }
+            document.getElementById('timetable_type').value = timetable_type_default;
+            console.log(timetable_type_default);
+            document.getElementById('exam_type').value = timetable_type_default;
+            document.getElementById('addDate').setAttribute("min", start_date_default);
+            document.getElementById('addDate').setAttribute("max", end_date_default);
+            document.getElementById('edit_Date').setAttribute("min", start_date_default);
+            document.getElementById('edit_Date').setAttribute("max", end_date_default);
         }
         //set values on page load
         $(document).ready(function() {
-            setDate();
+            changeDate();
             checkLabsConflicts();
             checkInvigilatorsConflicts();
         });
+
+        function calculateEndDate(date) {
+            var days = 4;
+            var end = new Date(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            end_date = stringifyDate(end);
+            return end_date;
+        }
+
+        function stringifyDate(datee) {
+            stringDate = datee.toISOString().substring(0, 10);
+            return stringDate;
+        }
         //if the date is changed and it's a sunday, update the start date and end date on the settings
-        document.getElementById("start_date").onchange = function() {
-            fromInput = 'M';
-            var date = new Date(this.value);
-            var end = new Date();
-            end.setDate(date.getDate() + 4);
-            const start_date_const = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-            const end_Date_const = end.getFullYear() + "-" + (end.getMonth() + 1) + "-" + end.getDate();
-            console.log(date);
+        function updateSettings() {
+            fromInput = document.getElementById('timetable_type').value;
+            startDateInput = document.getElementById('start_date');
+            var date = new Date(startDateInput.value);
+            // const start_date_const = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            const start_date_const = stringifyDate(date);
+            const end_Date_const = calculateEndDate(date);
             if (date.getDay() != 0) {
                 alert("A start date must be a sunday");
-                this.value = start_date_default;
+                startDateInput.value = start_date_default;
+                return;
             } else {
                 const data = {
                     start_date: start_date_const,
@@ -664,16 +742,20 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
-                        start_date_default = data.start_date;
-                        end_date_default = data.end_date;
+                        start_date_default = stringifyDate(new Date(new Date(data.start_date) - date
+                            .getTimezoneOffset() * 60000));
+                        end_date_default = stringifyDate(new Date(new Date(data.end_date) - date
+                            .getTimezoneOffset() * 60000));
+                        timetable_type_default = data.timetable_type;
+                        changeDate();
                     })
                     .catch((error) => {
                         console.error('Error:', error);
                         console.log(data);
                     });
             }
-        };
-
+            window.location.reload();
+        }
 
         function checkLabsConflicts() {
             fetch("{{ route('getAllExamsLabs') }}", {
@@ -702,7 +784,8 @@
                     data.exams.forEach((exam, index) => {
                         data.exams.forEach((eexam, eindex) => {
                             if (exam.exam_id != eexam.exam_id && exam.timeslot_id == eexam
-                                .timeslot_id && exam.date == eexam.date) {
+                                .timeslot_id && exam.date == eexam.date && exam.exam_type == eexam
+                                .exam_type) {
                                 exam.labs.forEach(lab => {
                                     examLabs.push(lab.lab_id);
                                 });
@@ -773,7 +856,8 @@
                     data.exams.forEach((exam, index) => {
                         data.exams.forEach((eexam, eindex) => {
                             if (exam.exam_id != eexam.exam_id && exam.timeslot_id == eexam
-                                .timeslot_id && exam.date == eexam.date) {
+                                .timeslot_id && exam.date == eexam.date && exam.exam_type == eexam
+                                .exam_type) {
                                 exam.tutors.forEach(tutor => {
                                     examTutors.push(tutor.tutor_id);
                                 });
@@ -906,13 +990,13 @@
     </script>
 
     <style>
-        select.multi[multiple]:focus option:checked {
-            background: linear-gradient(0deg, green 0%, green 100%);
-        }
+        /* select.multi[multiple]:focus option:checked {
+                                background: linear-gradient(0deg, green 0%, green 100%);
+                            }
 
-        thead {
-            display: table-row-group;
-        }
+                            thead {
+                                display: table-row-group;
+                            } */
 
     </style>
 @endsection

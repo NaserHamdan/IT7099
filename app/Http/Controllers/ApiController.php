@@ -161,6 +161,28 @@ class ApiController extends Controller
         return response(['lab' => $lab]);
     }
 
+    public function fetchExamData(Request $request)
+    {
+        $id = $request->id;
+        //
+        $exam = Exam::where('exam_id', $id)->first();
+        // dd($lab);
+        return response(['exam' => $exam]);
+    }
+
+    public function editExam(Request $request)
+    {
+        $data = $request->all();
+        $exam = Exam::where('exam_id', $data['exam_id'])->Update(
+            [
+                'timeslot_id' => $data['timeslot_id'],
+                'course_id' => $data['course_id'],
+                'date' => $data['date'],
+            ]
+        );
+        return redirect('/schedule');
+    }
+
     public function editLab(Request $request)
     {
         $data = $request->all();
@@ -214,6 +236,7 @@ class ApiController extends Controller
             [
                 'timeslot_id' => $data['timeslot_id'],
                 'date' => $data['date'],
+                'exam_type' =>$data['exam_type'],
             ]
         );
         return redirect('/schedule');

@@ -18,6 +18,7 @@ class Exam extends Model
         'timeslot_id',
         'course_id',
         'tutor_id',
+        'exam_type',
     ];
 
 

@@ -167,6 +167,7 @@
         </div>
     </div>
 
+    @if(Auth::user()->admin == 1)
     {{-- Add Course Modal --}}
     <div class=" hidden overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
         id="Add-Courses">
@@ -758,7 +759,7 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
             </div>
         </div>
     </div>
-
+@endif
 
     <script type="text/javascript">
 
@@ -788,7 +789,7 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
             document.getElementById(dropDownID).classList.toggle("hidden");
             document.getElementById(dropDownID).classList.toggle("flex");
         }
-
+        @if(Auth::user()->admin == 1)
         function toggleModal(modalID) {
             document.getElementById(modalID).classList.toggle("hidden");
             document.getElementById("backdrop").classList.toggle("hidden");
@@ -800,6 +801,7 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
 
         $(document).ready(function() {
             setValues("{{ route('fetchCourseData') }}", '{{ $courses[0]->course_id??1 }}');
+            @if(Auth::user()->admin == 1)
             var count = {{ $count }};
             if (count > 0) {
                 @for ($i = 1; $i <= $count; $i++)
@@ -809,6 +811,7 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
             } else {
 
             }
+            @endif
         });
 
         function addFields() {
@@ -968,5 +971,6 @@ hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition
                 document.getElementById('select' + i + "E").value = tutors[index].tutor_id;
             }
         }
+        @endif
     </script>
 @endsection

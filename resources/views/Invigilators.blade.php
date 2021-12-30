@@ -140,6 +140,7 @@
         </div>
     </div>
 
+    @if(Auth::user()->admin == 1)
     {{-- Add tutor Modal --}}
     <div class=" hidden overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center"
         id="Add-Tutor">
@@ -354,14 +355,9 @@
             </div>
         </div>
     </div>
-
+@endif
     <script type="text/javascript">
-        function toggleModal(modalID) {
-            document.getElementById(modalID).classList.toggle("hidden");
-            document.getElementById("backdrop").classList.toggle("hidden");
-            document.getElementById(modalID).classList.toggle("flex");
-            document.getElementById("backdrop").classList.toggle("flex");
-        }
+
 
         function sortBy(column) {
             if (getQueryVariable(`${column}`) == -1) {
@@ -372,7 +368,6 @@
                 window.location.replace("{{ route('Invigilators') }}");
             }
         }
-
         function getQueryVariable(variable) {
             var query = window.location.search.substring(1);
             var vars = query.split("&");
@@ -384,17 +379,26 @@
             }
             return -1; //not found
         }
-
         function toggleDropDown(dropDownID) {
             document.getElementById(dropDownID).classList.toggle("hidden");
             document.getElementById(dropDownID).classList.toggle("flex");
         }
 
+        @if(Auth::user()->admin == 1)
+        function toggleModal(modalID) {
+            document.getElementById(modalID).classList.toggle("hidden");
+            document.getElementById("backdrop").classList.toggle("hidden");
+            document.getElementById(modalID).classList.toggle("flex");
+            document.getElementById("backdrop").classList.toggle("flex");
+        }
+
         $(document).ready(function() {
+            @if(Auth::user()->admin == 1)
             var count = {{ $count }};
             if (count > 0) {
                 toggleModal('Review-Tutor');
             }
+            @endif
         });
 
 
@@ -427,5 +431,6 @@
                     document.getElementById('position').value = data.tutor.position;
                 });
         }
+        @endif
     </script>
 @endsection

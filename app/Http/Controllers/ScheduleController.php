@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
 {
-    //
     public function schedule()
     {
         $exams = Exam::with('course','timeslot','invigilations','labs','tutors')->get();

@@ -43,11 +43,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home')->middleware('aut
 //tutors routes
 Route::get('/invigilators', [InvigilatorsController::class, 'invigilators'])->name('Invigilators')->middleware('auth');
 //schedule routes
-Route::get('/schedule', [ScheduleController::class, 'schedule'])->name('schedule')->middleware('auth');
+Route::get('/schedule', [ScheduleController::class, 'schedule'])->name('Schedule')->middleware('auth');
 //labs routes
-Route::get('/labs', [LabsController::class, 'labs'])->name('labs')->middleware('auth');
+Route::get('/labs', [LabsController::class, 'labs'])->name('Labs')->middleware('auth');
 //courses routes
-Route::get('/courses', [CourseController::class, 'courses'])->name('courses')->middleware('auth');
+Route::get('/courses', [CourseController::class, 'courses'])->name('Courses')->middleware('auth');
 Route::get('/EditCourses', [CourseController::class, 'EditCourses'])->name('EditCourses')->middleware('auth');
 //load database routes
 Route::get('/LoadTutors', [InvigilatorsController::class, 'loadtutors'])->name('LoadTutors')->middleware('auth');
@@ -78,6 +78,8 @@ Route::get('/updateInvigilators', [ApiController::class, 'updateInvigilators'])-
 //
 Route::post('/addExam', [ApiController::class, 'addExam'])->name('addExam')->middleware('auth');
 Route::post('/deleteExam', [ApiController::class, 'deleteExam'])->name('deleteExam')->middleware('auth');
+Route::get('/fetchExamData', [ApiController::class, 'fetchExamData'])->name('fetchExamData')->middleware('auth');
+Route::post('/editExam', [ApiController::class, 'editExam'])->name('editExam')->middleware('auth');
 //
 Route::post('/updateSettings', [SettingController::class, 'updateSettings'])->name('updateSettings')->middleware('auth');
 

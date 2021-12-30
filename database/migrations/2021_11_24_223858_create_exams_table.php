@@ -16,6 +16,7 @@ class CreateExamsTable extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->id('exam_id')->autoIncrement();
             $table->date('date');
+            $table->char('exam_type',1);
             $table->foreignId('timeslot_id')->constrained('timeslots')->references('timeslot_id')->onDelete('cascade');
             $table->foreignId('course_id')->constrained('courses')->references('course_id')->onDelete('cascade');
         });

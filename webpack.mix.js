@@ -1,5 +1,5 @@
 const mix = require('laravel-mix');
-
+mix.vue({ version: 2, extractVueStyles: true });
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
