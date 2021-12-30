@@ -17,6 +17,8 @@
             }
         }
     }
+
+    $timetable_type = $setting->timetable_type ?? ' ';
     @endphp
     {{-- backdrop for modals --}}
     <div class="hidden opacity-25 fixed inset-0 z-40 bg-black" id="backdrop"></div>
@@ -101,7 +103,7 @@
                                 $index = 0;
                             @endphp
                             @foreach ($exams as $exam)
-                                @if ($exam->exam_type == 'B' || $exam->exam_type == $setting->timetable_type)
+                                @if ($exam->exam_type == 'B' || $exam->exam_type == $timetable_type)
                                     @php
                                         $index++;
                                     @endphp
@@ -233,7 +235,7 @@
                             <span class="text-gray-700">Course Code</span>
                             <select name="course_id" class="form-select mt-1 block w-full">
                                 @foreach ($courses as $course)
-                                    @if ($course->have_exam == 'B' || $course->have_exam == $setting->timetable_type)
+                                    @if ($course->have_exam == 'B' || $course->have_exam == $timetable_type)
                                         <option value="{{ $course->course_id }}">
                                             {{ $course->course_code . ' - ' . $course->course_title }}</option>
                                     @endif
@@ -293,7 +295,7 @@
                             <select name="exam_id" onchange="setValues('{{ route('fetchExamData') }}',this.value)"
                                 class="form-select mt-1 block w-full">
                                 @foreach ($exams as $exam)
-                                    @if ($exam->exam_type == $setting->timetable_type)
+                                    @if ($exam->exam_type == $timetable_type)
                                         <option value="{{ $exam->exam_id }}">
                                             {{ $exam->course->course_code . ' - ' . $exam->course->course_title }}
                                         </option>
@@ -305,7 +307,7 @@
                             <span class="text-gray-700">Course</span>
                             <select id="edit_course_id" name="course_id" class="form-select mt-1 block w-full">
                                 @foreach ($courses as $course)
-                                    @if ($course->have_exam == "B" || $course->have_exam == $setting->timetable_type)
+                                    @if ($course->have_exam == "B" || $course->have_exam == $timetable_type)
                                         <option value="{{ $course->course_id }}">
                                             {{ $course->course_code . ' - ' . $course->course_title }}</option>
                                     @endif
